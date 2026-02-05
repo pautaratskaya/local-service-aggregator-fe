@@ -1,0 +1,105 @@
+@use '../../variables' as *;
+@use 'sass:color';
+
+.profileCard {
+  height: 64px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  background-color: $secondary-button-background-color;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: color.scale($secondary-button-background-color, $lightness: -5%);
+  }
+
+  &:active {
+    background-color: color.scale($secondary-button-background-color, $lightness: -3%);
+  }
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.name {
+  font-size: 16px;
+  font-weight: 600;
+  color: $text-color;
+  margin: 0;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.details {
+  font-size: 12px;
+  color: $text-color;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+
+  .role {
+    font-weight: 600;
+  }
+}
+
+.phone {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: #d5d6d7;
+  flex-shrink: 0;
+}
+
+.deleteButton {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background-color: transparent;
+  color: $info-text-color;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, color 0.2s;
+  flex-shrink: 0;
+
+  &:hover {
+    background-color: $input-background-color;
+    color: $text-color;
+  }
+
+  &:active {
+    background-color: color.scale($input-background-color, $lightness: -5%);
+  }
+}

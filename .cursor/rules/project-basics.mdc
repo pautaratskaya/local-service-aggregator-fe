@@ -1,0 +1,43 @@
+---
+description: Project basics and response format requirements
+alwaysApply: true
+---
+
+# Project Description
+
+Frontend application for a local service aggregator. Built with React and TypeScript.
+
+## Tech Stack
+
+- **React 19.2** - UI library
+- **TypeScript** - typed JavaScript
+- **Vite** - build tool and dev server
+- **React Router** - routing
+- **SCSS Modules** - isolated styles
+- **ESLint + Prettier** - linting and code formatting
+
+## Project Structure
+
+```
+src/
+  ├── components/     # Reusable components
+  ├── pages/          # Application pages
+  ├── assets/         # Images and static files
+  └── variables.scss  # Global SCSS variables
+```
+
+## Response Format Requirements
+
+### Communication Style
+- Be concise and factual, like a reference manual
+- No praise or validation of questions/answers
+- Focus on efficient development
+- Ask clarifying questions before making code changes when requirements are unclear
+
+### Code Style
+- Use functional React components
+- Apply TypeScript for type safety
+- Use SCSS Modules for styles (`ComponentName.module.scss`)
+- Follow naming conventions: PascalCase for components, camelCase for functions
+- Code comments in English
+- Variable, function, and component names in English

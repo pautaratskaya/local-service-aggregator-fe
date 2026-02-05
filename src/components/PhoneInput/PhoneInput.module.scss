@@ -1,0 +1,37 @@
+@use '../../variables' as *;
+
+.phoneInput {
+  margin-top: 16px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 14px 16px;
+  gap: 12px;
+  background-color: $input-background-color;
+  border-radius: 12px;
+  border: none;
+
+  .inputIcon {
+    width: 24px;
+    height: 18px;
+    flex-shrink: 0;
+    border-radius: 2px;
+  }
+
+  input {
+    width: 100%;
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 20px;
+    font-weight: 600;
+    color: $text-color;
+    outline: none;
+    font-family: $font-family;
+
+    &::placeholder {
+      color: $placeholder-color;
+    }
+  }
+}
