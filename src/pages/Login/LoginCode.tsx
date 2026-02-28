@@ -10,12 +10,17 @@ import { authService } from '../../api/auth/authService';
 import { AuthError } from '../../api/auth/types';
 import { LOGIN_ERROR_TYPES } from '../../api/auth/login';
 import { useAuthStore } from '../../stores/authStore';
+import type { UserRole } from '../../types/user';
 
 const CODE_LENGTH = 6;
 const RESEND_CODE_TIMER = 60;
 
+export type LoginNextPayload =
+  | { isExistingUser?: false }
+  | { isExistingUser: true; roles: UserRole[] };
+
 interface LoginCodeProps {
-  onNext: (code: string) => void;
+  onNext: (payload: LoginNextPayload) => void;
   onBack: () => void;
   phone: string;
 }
@@ -69,9 +74,7 @@ function LoginCode({ onNext, onBack, phone }: LoginCodeProps) {
       if (err instanceof AuthError) {
         // Handle specific error types
         if (err.type === LOGIN_ERROR_TYPES.USER_NOT_FOUND) {
-          // TODO: send not code, but result which page to show next
-          // User not found - proceed to registration
-          onNext(code);
+          onNext({ isExistingUser: false });
         } else {
           setError(err.message);
         }
@@ -101,14 +104,15 @@ function LoginCode({ onNext, onBack, phone }: LoginCodeProps) {
         {
           id: response.id,
           phone: response.phone,
-          realName: response.realName,
+          firstName: response.firstName,
+          lastName: response.lastName,
           roles: response.roles,
           createdAt: response.createdAt,
         },
         response.token
       );
 
-      onNext(code);
+      onNext({ isExistingUser: true, roles: response.roles });
     } catch (err) {
       handleLoginError(err);
     } finally {

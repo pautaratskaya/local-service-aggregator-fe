@@ -1,3 +1,4 @@
+import type { User } from '../../types/user';
 import { API_BASE_URL } from '../config';
 import { COMMON_ERROR_TYPES } from '../errors';
 import { AuthError } from './types';
@@ -16,12 +17,7 @@ export interface LoginRequest {
   code: string;
 }
 
-export interface LoginResponse {
-  id: number;
-  phone: string;
-  realName: string;
-  roles: string[];
-  createdAt: string;
+export interface LoginResponse extends User {
   token: string;
 }
 

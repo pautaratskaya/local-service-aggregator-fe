@@ -2,15 +2,15 @@ import { useState, useRef, type InputHTMLAttributes } from 'react';
 import styles from './PhoneInput.module.scss';
 import {
   PREFIX,
-  formatPhoneNumber,
+  formatEditablePart,
   formattedPhoneToDigits,
+  MAX_DIGITS,
   mapCursorToDigitIndex,
   mapDigitIndexToCursor,
-  findChangeIndex,
   deleteDigitAtIndex,
-  MAX_DIGITS,
 } from './helpers';
-import { useAutoFocus, preventScrollOnFocus } from '../../hooks/useAutoFocus';
+import { useAutoFocus } from '../../hooks/useAutoFocus';
+import { BelarusFlagIcon } from '../../icons';
 
 type PhoneInputProps = Omit<
   InputHTMLAttributes<HTMLInputElement>,
@@ -19,26 +19,6 @@ type PhoneInputProps = Omit<
   onChange?: (value: string) => void;
   initialValue?: string;
 };
-
-const BelarusFlag = () => (
-  <svg
-    width="24"
-    height="18"
-    viewBox="0 0 24 18"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className={styles.phoneInput__icon}
-  >
-    <path
-      d="M4 0C1.79 0 0 1.79 0 4V12H24V4C24 1.79 22.21 0 20 0H4Z"
-      fill="#CE1720"
-    />
-    <path
-      d="M0 12H24V14C24 16.21 22.21 18 20 18H4C1.79 18 0 16.21 0 14V12Z"
-      fill="#00A651"
-    />
-  </svg>
-);
 
 function PhoneInput({
   initialValue,
@@ -54,34 +34,41 @@ function PhoneInput({
   useAutoFocus(inputRef, !!autoFocus);
 
   const updateDigitsAndCursor = (
-    newDigits: string,
+    nextDigits: string,
     digitIndex: number,
     input: HTMLInputElement
   ) => {
-    setDigits(newDigits);
-    onChange?.(`${PREFIX}${newDigits}`);
+    setDigits(nextDigits);
+    onChange?.(`${PREFIX}${nextDigits}`);
 
     setTimeout(() => {
-      const cursorPos = mapDigitIndexToCursor(digitIndex, newDigits);
-      input.setSelectionRange(cursorPos, cursorPos);
+      const nextCursor = mapDigitIndexToCursor(digitIndex, nextDigits);
+      input.setSelectionRange(nextCursor, nextCursor);
     }, 0);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.currentTarget;
-    const newDigits = formattedPhoneToDigits(e.target.value);
+    const rawValue = input.value;
+    const cursorPos = input.selectionStart ?? rawValue.length;
+    const newDigits = formattedPhoneToDigits(rawValue);
+    const nextDigitIndex = (rawValue.slice(0, cursorPos).match(/\d/g) || [])
+      .length;
 
-    if (newDigits === digits) return;
+    setDigits(newDigits);
+    onChange?.(`${PREFIX}${newDigits}`);
 
-    const changeIndex = findChangeIndex(digits, newDigits);
-    updateDigitsAndCursor(newDigits, changeIndex, input);
+    setTimeout(() => {
+      const nextCursor = mapDigitIndexToCursor(nextDigitIndex, newDigits);
+      input.setSelectionRange(nextCursor, nextCursor);
+    }, 0);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     const input = e.currentTarget;
-    const cursorPos = input.selectionStart || 0;
+    const selectionStart = input.selectionStart || 0;
     const selectionEnd = input.selectionEnd || 0;
-    const hasSelection = cursorPos !== selectionEnd;
+    const hasSelection = selectionStart !== selectionEnd;
     const isCharacterKey = e.key.length === 1;
     const isDigit = /\d/.test(e.key);
 
@@ -97,39 +84,58 @@ function PhoneInput({
     if (e.key === 'Backspace') {
       e.preventDefault();
 
-      if (cursorPos <= PREFIX.length) return;
+      const startDigitIndex = mapCursorToDigitIndex(selectionStart, digits);
+      const endDigitIndex = mapCursorToDigitIndex(selectionEnd, digits);
 
-      const digitIndex = mapCursorToDigitIndex(cursorPos, digits);
-
-      if (digitIndex > 0) {
-        const newDigits = deleteDigitAtIndex(digits, digitIndex - 1);
-        updateDigitsAndCursor(newDigits, digitIndex - 1, input);
+      if (hasSelection) {
+        const nextDigits =
+          digits.slice(0, startDigitIndex) + digits.slice(endDigitIndex);
+        updateDigitsAndCursor(nextDigits, startDigitIndex, input);
+        return;
       }
+
+      if (startDigitIndex === 0) return;
+
+      const removeIndex = startDigitIndex - 1;
+      const nextDigits = deleteDigitAtIndex(digits, removeIndex);
+      updateDigitsAndCursor(nextDigits, removeIndex, input);
+      return;
     }
 
     if (e.key === 'Delete') {
       e.preventDefault();
 
-      if (cursorPos < PREFIX.length) return;
+      const startDigitIndex = mapCursorToDigitIndex(selectionStart, digits);
+      const endDigitIndex = mapCursorToDigitIndex(selectionEnd, digits);
 
-      const digitIndex = mapCursorToDigitIndex(cursorPos, digits);
-      const newDigits = deleteDigitAtIndex(digits, digitIndex);
-      updateDigitsAndCursor(newDigits, digitIndex, input);
+      if (hasSelection) {
+        const nextDigits =
+          digits.slice(0, startDigitIndex) + digits.slice(endDigitIndex);
+        updateDigitsAndCursor(nextDigits, startDigitIndex, input);
+        return;
+      }
+
+      if (startDigitIndex >= digits.length) return;
+
+      const nextDigits = deleteDigitAtIndex(digits, startDigitIndex);
+      updateDigitsAndCursor(nextDigits, startDigitIndex, input);
     }
   };
 
   return (
     <div className={styles.phoneInput}>
-      <BelarusFlag />
-      <input
-        ref={inputRef}
-        type="tel"
-        value={formatPhoneNumber(digits)}
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
-        onPointerDown={preventScrollOnFocus}
-        {...inputProps}
-      />
+      <BelarusFlagIcon />
+      <div className={styles.inputWrapper}>
+        <span className={styles.prefix}>{PREFIX}</span>
+        <input
+          ref={inputRef}
+          type="tel"
+          value={formatEditablePart(digits)}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          {...inputProps}
+        />
+      </div>
     </div>
   );
 }

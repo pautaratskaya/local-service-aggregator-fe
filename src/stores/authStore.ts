@@ -1,27 +1,20 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-
-interface User {
-  id: number;
-  phone: string;
-  realName: string;
-  roles: string[];
-  createdAt: string;
-}
+import { type User, type UserRole } from '../types/user';
 
 interface AuthState {
-  selectedProfileId: string;
+  selectedRole: UserRole | null;
   user: User | null;
   token: string | null;
 
-  setSelectedProfileId: (id: string) => void;
+  setSelectedRole: (role: UserRole) => void;
   setAuth: (user: User, token: string) => void;
   logout: () => void;
   reset: () => void;
 }
 
 const initialState = {
-  selectedProfileId: '',
+  selectedRole: null,
   user: null,
   token: null,
 };
@@ -30,9 +23,9 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       ...initialState,
-      setSelectedProfileId: (id) => set({ selectedProfileId: id }),
+      setSelectedRole: (role) => set({ selectedRole: role }),
       setAuth: (user, token) => set({ user, token }),
-      logout: () => set({ user: null, token: null, selectedProfileId: '' }),
+      logout: () => set({ user: null, token: null, selectedRole: null }),
       reset: () => set(initialState),
     }),
     {

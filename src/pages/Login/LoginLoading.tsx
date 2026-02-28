@@ -19,7 +19,7 @@ function LoginLoading({
   loadingDuration = 2000,
   successDuration = 1500,
 }: LoginLoadingProps) {
-  // TODO: add 'error' status
+  // TODO: !!! add 'error' status
   const [status, setStatus] = useState<'loading' | 'success'>('loading');
 
   useEffect(() => {

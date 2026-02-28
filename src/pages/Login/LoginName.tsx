@@ -11,18 +11,19 @@ import styles from './Login.module.scss';
 
 interface LoginNameProps {
   phone: string;
-  onNext: (userData: { name: string; surname: string }) => void;
+  onNext: (userData: { firstName: string; lastName: string }) => void;
+  onBackToPhone: () => void;
 }
 
-function LoginName({ phone, onNext }: LoginNameProps) {
-  const [name, setName] = useState('');
-  const [surname, setSurname] = useState('');
+function LoginName({ phone, onNext, onBackToPhone }: LoginNameProps) {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const setAuth = useAuthStore((state) => state.setAuth);
 
-  const canSubmitInput = name.trim() && surname.trim() && !isSubmitting;
+  const canSubmitInput = firstName.trim() && lastName.trim() && !isSubmitting;
 
   const handleSubmit = useCallback(async () => {
     if (!canSubmitInput) {
@@ -33,25 +34,27 @@ function LoginName({ phone, onNext }: LoginNameProps) {
     setError(null);
 
     try {
-      const realName = `${name.trim()} ${surname.trim()}`;
       const response = await authService.register({
         phone,
-        realName,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
       });
 
+      // TODO: review this
       // Save user data and token
       setAuth(
         {
           id: response.id,
           phone: response.phone,
-          realName: response.realName,
+          firstName: response.firstName,
+          lastName: response.lastName,
           roles: response.roles,
           createdAt: response.createdAt,
         },
         response.token
       );
 
-      onNext({ name: name.trim(), surname: surname.trim() });
+      onNext({ firstName: firstName.trim(), lastName: lastName.trim() });
     } catch (err) {
       if (err instanceof AuthError) {
         // Handle specific error types
@@ -66,7 +69,7 @@ function LoginName({ phone, onNext }: LoginNameProps) {
     } finally {
       setIsSubmitting(false);
     }
-  }, [canSubmitInput, name, surname, phone, onNext, setAuth]);
+  }, [canSubmitInput, firstName, lastName, phone, onNext, setAuth]);
 
   useEnterSubmit(handleSubmit);
 
@@ -77,14 +80,14 @@ function LoginName({ phone, onNext }: LoginNameProps) {
         description="Это имя увидят мастера и другие пользователи приложения"
       >
         <TextInput
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
           placeholder="Введите имя"
           autoFocus
         />
         <TextInput
-          value={surname}
-          onChange={(e) => setSurname(e.target.value)}
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
           placeholder="Введите фамилию"
         />
         {error && <p className={styles.error}>{error}</p>}
@@ -92,7 +95,10 @@ function LoginName({ phone, onNext }: LoginNameProps) {
 
       <footer>
         <p className={styles.info}>
-          Профиль будет создан для номера <a href={`tel:${phone}`}>{phone}</a>
+          Профиль будет создан для номера{' '}
+          <button className={styles.link} onClick={onBackToPhone}>
+            {phone}
+          </button>
         </p>
         <Button onClick={handleSubmit} cta disabled={!canSubmitInput}>
           {isSubmitting ? 'Регистрация...' : 'Завершить'}

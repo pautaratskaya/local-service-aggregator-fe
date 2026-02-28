@@ -3,11 +3,12 @@ import Modal from '../../components/Modal';
 import LoginWelcome from './LoginWelcome';
 import LoginPhone from './LoginPhone';
 import LoginName from './LoginName';
-import LoginCode from './LoginCode';
+import LoginCode, { type LoginNextPayload } from './LoginCode';
 import LoginLoading from './LoginLoading';
-import LoginChooseProfile from './LoginChooseProfile';
+import LoginChooseRole from './LoginChooseRole';
 import { useAuthStore } from '../../stores/authStore';
-import { useProfiles } from '../../hooks/useProfilesMock';
+import type { UserRole } from '../../types/user';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const LOGIN_STEPS = {
   Welcome: 'welcome',
@@ -15,7 +16,7 @@ const LOGIN_STEPS = {
   Code: 'code',
   Name: 'name',
   ProfileCreation: 'profileCreation',
-  ChooseProfile: 'chooseProfile',
+  ChooseRole: 'chooseRole',
   Authorization: 'authorization',
 } as const;
 
@@ -24,59 +25,52 @@ type LoginStep = (typeof LOGIN_STEPS)[keyof typeof LOGIN_STEPS];
 function Login() {
   const [step, setStep] = useState<LoginStep>(LOGIN_STEPS.Welcome);
   const [phone, setPhone] = useState('');
-  const [newUserData, setNewUserData] = useState<{
-    name: string;
-    surname: string;
-  } | null>(null);
 
-  const { data: profiles } = useProfiles();
-  const selectedProfileId = useAuthStore((state) => state.selectedProfileId);
-  const setSelectedProfileId = useAuthStore(
-    (state) => state.setSelectedProfileId
-  );
-
-  const selectedProfile = profiles?.find((p) => p.id === selectedProfileId);
+  const selectedRole = useAuthStore((state) => state.selectedRole);
+  const user = useAuthStore((state) => state.user);
+  const setSelectedRole = useAuthStore((state) => state.setSelectedRole);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const background = location.state?.background;
 
   const handlePhoneNext = (phoneValue: string) => {
     setPhone(phoneValue);
     setStep(LOGIN_STEPS.Code);
   };
 
-  const handleCodeNext = (codeValue: string) => {
-    // TODO: Check if user exists
-    // TODO: Replace with actual API call
-    const userExists = codeValue === '123456';
-
-    if (!userExists) {
+  const handleCodeNext = (payload: LoginNextPayload) => {
+    if (!payload.isExistingUser) {
       setStep(LOGIN_STEPS.Name);
-    } else {
-      setStep(LOGIN_STEPS.ChooseProfile);
+      return;
     }
+
+    const { roles } = payload;
+    setStep(
+      roles.length > 1
+        ? LOGIN_STEPS.ChooseRole
+        : LOGIN_STEPS.Authorization
+    );
   };
 
-  const handleNameNext = ({
-    name,
-    surname,
-  }: {
-    name: string;
-    surname: string;
-  }) => {
-    setNewUserData({ name, surname });
+  const handleNameNext = () => {
     setStep(LOGIN_STEPS.ProfileCreation);
   };
 
-  const handleChooseProfileNext = (profileId: string) => {
-    setSelectedProfileId(profileId);
-    // TODO: make sure it waits for the selected profile to be loaded
+  const handleChooseRoleNext = (role: UserRole) => {
+    setSelectedRole(role);
+    // TODO: make sure it waits for the selected role to be loaded
     setStep(LOGIN_STEPS.Authorization);
   };
 
   const handleDone = () => {
-    // TODO: navigate to main app (update background page with user info)
-    console.log('Login complete:', {
+    // TODO: make sure to update the page with user info
+    console.log('===> background', background);
+    navigate(background?.pathname || '/');
+
+    console.log('===> Login complete:', {
       phone,
-      newUserData,
-      selectedProfileId,
+      user,
+      selectedRole,
     });
   };
 
@@ -96,19 +90,23 @@ function Login() {
         />
       )}
       {step === LOGIN_STEPS.Name && (
-        <LoginName phone={phone} onNext={handleNameNext} />
+        <LoginName
+          phone={phone}
+          onNext={handleNameNext}
+          onBackToPhone={() => setStep(LOGIN_STEPS.Phone)}
+        />
       )}
       {step === LOGIN_STEPS.ProfileCreation && (
         <LoginLoading onNext={handleDone} successMessage="Готово!" />
       )}
-      {step === LOGIN_STEPS.ChooseProfile && (
-        <LoginChooseProfile onNext={handleChooseProfileNext} />
+      {step === LOGIN_STEPS.ChooseRole && (
+        <LoginChooseRole onNext={handleChooseRoleNext} user={user!} />
       )}
       {step === LOGIN_STEPS.Authorization && (
         <LoginLoading
           onNext={handleDone}
           successMessage="С возвращением,"
-          highlightedText={`${selectedProfile?.name}!`}
+          highlightedText={`${user?.firstName}!`}
         />
       )}
     </Modal>

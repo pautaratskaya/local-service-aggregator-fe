@@ -1,3 +1,4 @@
+import type { User } from '../../types/user';
 import { API_BASE_URL } from '../config';
 import { COMMON_ERROR_TYPES } from '../errors';
 import { AuthError } from './types';
@@ -12,15 +13,11 @@ export type RegisterErrorType =
 
 export interface RegisterRequest {
   phone: string;
-  realName: string;
+  firstName: string;
+  lastName: string;
 }
 
-export interface RegisterResponse {
-  id: number;
-  phone: string;
-  realName: string;
-  roles: string[];
-  createdAt: string;
+export interface RegisterResponse extends User {
   token: string;
 }
 

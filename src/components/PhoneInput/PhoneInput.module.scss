@@ -19,19 +19,44 @@
     border-radius: 2px;
   }
 
-  input {
-    width: 100%;
+  .inputWrapper {
+    display: flex;
+    align-items: center;
     flex: 1;
-    border: none;
-    background: transparent;
-    font-size: 20px;
-    font-weight: 600;
-    color: $text-color;
-    outline: none;
-    font-family: $font-family;
+    min-width: 0;
+    gap: 3px;
 
-    &::placeholder {
-      color: $placeholder-color;
+    .prefix, input {
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 1.2;
+      color: $text-color;
+      font-family: $font-family;
+      padding: 0;
+    }
+
+    .prefix {
+      display: inline-flex;
+      align-items: center;
+      user-select: none;
+      pointer-events: none;
+    }
+  
+    input {
+      width: 100%;
+      flex: 1;
+      min-width: 0;
+      margin: 0;
+      padding: 0;
+      border: none;
+      background: transparent;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+  
+      &::placeholder {
+        color: $placeholder-color;
+      }
     }
   }
 }

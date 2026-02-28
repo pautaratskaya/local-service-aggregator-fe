@@ -1,44 +1,48 @@
 @use '../../variables' as *;
 
 .button {
-    height: 56px;
-    width: 100%;
-    border: none;
-    border-radius: 50px;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s, color 0.2s, transform 0.1s;
-    background-color: $secondary-button-background-color;
-    color: $secondary-button-text-color;
+  height: 56px;
+  width: 100%;
+  padding: 0 35px;
+  border: none;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    transform 0.1s;
+  background-color: $secondary-button-background-color;
+  color: $secondary-button-text-color;
+
+  &:hover:not(:disabled) {
+    background-color: $secondary-button-hover-background-color;
+    color: $secondary-button-hover-text-color;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    background-color: $secondary-button-disabled-background-color;
+    color: $secondary-button-disabled-text-color;
+  }
+
+  &.cta {
+    background-color: $cta-button-background-color;
+    color: $cta-button-text-color;
 
     &:hover:not(:disabled) {
-        background-color: $secondary-button-hover-background-color;
-        color: $secondary-button-hover-text-color;
-    }
-
-    &:active:not(:disabled) {
-        transform: scale(0.98);
+      background-color: $cta-button-hover-background-color;
+      color: $cta-button-hover-text-color;
     }
 
     &:disabled {
-        cursor: not-allowed;
-        background-color: $secondary-button-disabled-background-color;
-        color: $secondary-button-disabled-text-color;
+      background-color: $cta-button-disabled-background-color;
+      color: $cta-button-disabled-text-color;
     }
-
-    &.cta {
-        background-color: $cta-button-background-color;
-        color: $cta-button-text-color;
-
-        &:hover:not(:disabled) {
-            background-color: $cta-button-hover-background-color;
-            color: $cta-button-hover-text-color;
-        }
-
-        &:disabled {
-            background-color: $cta-button-disabled-background-color;
-            color: $cta-button-disabled-text-color;
-        }
-    }
+  }
 }

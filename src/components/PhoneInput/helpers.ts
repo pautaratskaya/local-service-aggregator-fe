@@ -1,4 +1,4 @@
-export const PREFIX = '+375';
+export const PREFIX = '+000';
 export const MAX_DIGITS = 9;
 
 /**
@@ -57,55 +57,48 @@ export function formatPhoneNumber(digitString: string): string {
 }
 
 /**
- * Maps cursor position from formatted string to digit index
- * @param cursorPos - Cursor position in formatted string
- * @param currentDigits - Current digits string
+ * Returns editable part without immutable prefix
+ * @param digits - Current digits string
+ * @returns Formatted part rendered inside input
+ */
+export function formatEditablePart(digits: string): string {
+  const formatted = formatPhoneNumber(digits);
+  if (formatted === PREFIX) return '';
+  return formatted.slice(PREFIX.length).trimStart();
+}
+
+/**
+ * Maps cursor position from editable formatted string to digit index
+ * @param cursorIndex - Cursor position in input value
+ * @param digits - Current digits string
  * @returns Index in the digits string
  */
 export function mapCursorToDigitIndex(
   cursorIndex: number,
   digits: string
 ): number {
-  const formatted = formatPhoneNumber(digits);
-  const textBeforeCursor = formatted.slice(PREFIX.length, cursorIndex);
+  const formatted = formatEditablePart(digits);
+  const textBeforeCursor = formatted.slice(0, cursorIndex);
   return (textBeforeCursor.match(/\d/g) || []).length;
 }
 
 /**
- * Maps digit index back to cursor position in formatted string
+ * Maps digit index back to cursor position in editable formatted string
  * @param digitIndex - Index in the digits string
- * @param newDigits - New digits string
- * @returns Cursor position in formatted string
+ * @param digits - Current digits string
+ * @returns Cursor position in input value
  */
 export function mapDigitIndexToCursor(
   digitIndex: number,
   digits: string
 ): number {
-  if (digitIndex === 0) return PREFIX.length;
+  if (digitIndex <= 0) return 0;
 
-  const formatted = formatPhoneNumber(digits);
-  const textAfterPrefix = formatted.slice(PREFIX.length);
-  const matches = Array.from(textAfterPrefix.matchAll(/\d/g));
+  const formatted = formatEditablePart(digits);
+  const matches = Array.from(formatted.matchAll(/\d/g));
+  const match = matches[digitIndex - 1];
 
-  // Return position after the digit (index + 1) adjusted for prefix
-  return matches[digitIndex - 1]
-    ? PREFIX.length + matches[digitIndex - 1].index! + 1
-    : formatted.length;
-}
-
-/**
- * Finds the index where change occurred between old and new digit strings
- * @param oldDigits - Previous digits string
- * @param newDigits - New digits string
- * @returns Index after the changed position
- */
-export function findChangeIndex(oldDigits: string, newDigits: string): number {
-  for (let i = 0; i < newDigits.length; i++) {
-    if (oldDigits[i] !== newDigits[i]) {
-      return i + 1;
-    }
-  }
-  return newDigits.length;
+  return match ? match.index! + 1 : formatted.length;
 }
 
 /**
