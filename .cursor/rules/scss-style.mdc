@@ -1,0 +1,51 @@
+---
+description: SCSS module structure and nesting conventions
+alwaysApply: true
+---
+
+# SCSS Style Rules
+
+- Do only minimal required changes, do not rewrite properties without asking.
+- For any solutions follow the same pattern as already used in the project.
+
+## Nesting
+
+- Reflect the DOM hierarchy in SCSS nesting: child elements are nested inside their parent selector.
+- BEM modifiers (`&.modifier`) are nested inside the block they modify.
+- Pseudo-elements and pseudo-classes (`&::placeholder`, `&:hover`) are nested inside their element.
+
+## Order inside a selector
+
+1. Own properties (layout, sizing, colors, etc.)
+2. State modifiers (`&.modifier`)
+3. Child elements (`.child {}`)
+4. Pseudo-elements (`&::before`, `&::after`)
+
+## Example
+
+```scss
+.block {
+  // own properties
+
+  &.blockModifier {
+    // modifier overrides
+  }
+
+  .child {
+    // child properties
+
+    &.childModifier {
+      // child modifier
+    }
+  }
+
+  &::placeholder {
+    // pseudo-element
+  }
+}
+```
+
+## Do not
+
+- Do not write child or modifier selectors as flat top-level classes if they logically belong inside a parent.
+- Do not repeat the parent selector manually — use `&`.

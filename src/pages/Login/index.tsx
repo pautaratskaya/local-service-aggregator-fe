@@ -46,9 +46,7 @@ function Login() {
 
     const { roles } = payload;
     setStep(
-      roles.length > 1
-        ? LOGIN_STEPS.ChooseRole
-        : LOGIN_STEPS.Authorization
+      roles.length > 1 ? LOGIN_STEPS.ChooseRole : LOGIN_STEPS.Authorization
     );
   };
 

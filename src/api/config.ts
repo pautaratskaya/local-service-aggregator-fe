@@ -1,6 +1,4 @@
-// In development, Vite proxy will forward /api to https://aggregator.duckdns.org
+// In development, Vite proxy will forward /api to http://62.238.112.250:8080
 // In production, we use the full URL
 export const API_BASE_URL =
-  import.meta.env.MODE === 'development'
-    ? ''
-    : 'https://aggregator.duckdns.org';
+  import.meta.env.MODE === 'development' ? '' : 'http://62.238.112.250:8080';

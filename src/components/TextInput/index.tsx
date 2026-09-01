@@ -1,12 +1,32 @@
 import { type InputHTMLAttributes } from 'react';
 import styles from './TextInput.module.scss';
 
-type TextInputProps = InputHTMLAttributes<HTMLInputElement>;
+type TextInputProps = InputHTMLAttributes<HTMLInputElement> & {
+  label?: string;
+  error?: string;
+  required?: boolean;
+};
 
-function TextInput({ ...inputProps }: TextInputProps) {
+function TextInput({
+  label,
+  error,
+  required = false,
+  type = 'text',
+  ...inputProps
+}: TextInputProps) {
+  const titleText = error || label;
+
   return (
-    <div className={styles.textInput}>
-      <input type="text" {...inputProps} />
+    <div
+      className={`${styles.textInput} ${titleText ? styles.withTitle : ''} ${error ? styles.errorState : ''}`}
+    >
+      {titleText && (
+        <span className={`${styles.title}`}>
+          {titleText}
+          {!error && required && ' *'}
+        </span>
+      )}
+      <input type={type} {...inputProps} aria-invalid={Boolean(error)} />
     </div>
   );
 }

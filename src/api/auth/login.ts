@@ -18,7 +18,7 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse extends User {
-  token: string;
+  token: string; // TODO: remove
 }
 
 function getErrorInfo(status: number): {
@@ -48,6 +48,7 @@ export async function login(data: LoginRequest): Promise<LoginResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}/api/users/login`, {
       method: 'POST',
+      // credentials: 'include', // TODO: token
       headers: {
         'Content-Type': 'application/json',
       },

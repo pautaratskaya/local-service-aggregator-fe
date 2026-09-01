@@ -38,6 +38,7 @@ function LoginCode({ onNext, onBack, phone }: LoginCodeProps) {
     code.length === CODE_LENGTH && timeLeft > 0 && !isSubmitting;
 
   // Timer countdown for resend code
+  // TODO: fix wrong time countdown if page is unfocused
   useEffect(() => {
     if (timeLeft <= 0) return;
 

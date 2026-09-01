@@ -1,0 +1,23 @@
+---
+description: Require explicit approval for deletions and non-requested changes
+alwaysApply: true
+---
+
+# Change Safety Rules
+
+## Scope
+
+These rules apply to every prompt in this workspace.
+
+## Required Behavior
+
+- Make only the changes explicitly requested by the user.
+- Do not delete or replace existing content unless the user explicitly asks for it.
+- Never overwrite user-authored edits while making unrelated changes.
+- If you notice issues outside the requested scope, stop and ask whether the user wants them fixed.
+- Before broad refactors or cleanup, ask for confirmation first.
+
+## Communication
+
+- If a request is ambiguous, ask a clarifying question before editing files.
+- Briefly describe planned edits before applying them.

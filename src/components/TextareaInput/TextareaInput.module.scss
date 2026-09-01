@@ -1,23 +1,17 @@
 @use '../../variables' as *;
 
-.textInput {
+.textareaInput {
   width: 100%;
-  height: 56px;
+  min-height: 120px;
   margin-top: 16px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   box-sizing: border-box;
   padding: 10px 16px;
   background-color: $input-background-color;
   color: $placeholder-color;
   border-radius: 16px;
   border: none;
-
-  &.withTitle {
-    height: 70px;
-    align-items: flex-start;
-  }
 
   &.errorState {
     border: 1px solid rgba($error-color, 0.7);
@@ -32,9 +26,10 @@
     margin-bottom: 6px;
   }
 
-  input {
+  textarea {
     width: 100%;
-    min-height: 24px;
+    min-height: 72px;
+    flex: 1;
     border: none;
     background: transparent;
     font-size: 20px;
@@ -42,10 +37,18 @@
     color: $text-color;
     outline: none;
     font-family: $font-family;
+    resize: none;
 
     &::placeholder {
       color: $placeholder-color;
       font-weight: 400;
     }
+  }
+
+  .meta {
+    margin: 6px 0 0;
+    color: $info-text-color;
+    font-size: 12px;
+    text-align: right;
   }
 }

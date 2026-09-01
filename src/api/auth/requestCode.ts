@@ -42,6 +42,7 @@ export async function requestCode(data: RequestCodeRequest): Promise<string> {
   try {
     const response = await fetch(`${API_BASE_URL}/api/users/request-code`, {
       method: 'POST',
+      // credentials: 'include', // TODO: token
       headers: {
         'Content-Type': 'application/json',
       },

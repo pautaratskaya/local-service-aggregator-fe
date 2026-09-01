@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://aggregator.duckdns.org',
+        target: 'http://62.238.112.250:8080',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path,

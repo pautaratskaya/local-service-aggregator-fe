@@ -21,8 +21,7 @@ function Home() {
   };
 
   const onBecomeLandlordClick = () => {
-    // TODO: Implement become landlord logic
-    console.log('===> become landlord');
+    navigate('/become-landlord', { state: { background: location } });
   };
 
   const onBecomeMasterClick = () => {
@@ -51,7 +50,7 @@ function Home() {
             <h1>Привет, {user?.firstName}!</h1>
             <div className={styles.actions}>
               {!user.roles.includes(USER_ROLES.LANDLORD) && (
-                <Button onClick={onBecomeLandlordClick} disabled cta>
+                <Button onClick={onBecomeLandlordClick} cta>
                   Стать арендодателем
                 </Button>
               )}

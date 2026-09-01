@@ -1,0 +1,120 @@
+@use '../../variables' as *;
+
+.fileInput {
+  width: 100%;
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 10px 16px;
+  background-color: $input-background-color;
+  color: $placeholder-color;
+  border-radius: 16px;
+  border: none;
+
+  &.errorState {
+    border: 1px solid rgba($error-color, 0.7);
+    background-color: rgba($error-color, 0.08);
+    color: $error-color;
+  }
+
+  .title {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+
+  .hiddenInput {
+    display: none;
+  }
+
+  .pickButton {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: $font-family;
+    cursor: pointer;
+    transition:
+      background-color 0.2s,
+      color 0.2s,
+      transform 0.1s;
+    background-color: $secondary-button-background-color;
+    color: $secondary-button-text-color;
+
+    &:hover {
+      background-color: $secondary-button-hover-background-color;
+      color: $secondary-button-hover-text-color;
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+
+  .hiddenInput:disabled + .pickButton {
+    cursor: not-allowed;
+    background-color: $secondary-button-disabled-background-color;
+    color: $secondary-button-disabled-text-color;
+    pointer-events: none;
+  }
+
+  .previewList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .previewItem {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    border-radius: 10px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .previewImage {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .removeButton {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: none;
+    background-color: rgba($background-color, 0.9);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+
+    svg {
+      width: 8px;
+      height: 8px;
+    }
+  }
+
+  .meta {
+    margin: 6px 0 0;
+    color: $info-text-color;
+    font-size: 12px;
+  }
+}

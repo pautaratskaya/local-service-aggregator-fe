@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://aggregator.duckdns.org/api/:path*"
+      "destination": "http://62.238.112.250:8080/api/:path*"
     },
     {
       "source": "/:path*",

@@ -1,5 +1,14 @@
 TODO: update this file & docs; cover all the components with tests; add the pipeline
 
+# Local Service Aggregator FE
+
+## Run locally
+
+```bash
+pnpm install
+pnpm dev
+```
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

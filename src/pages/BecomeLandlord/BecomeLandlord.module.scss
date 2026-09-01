@@ -1,0 +1,83 @@
+@use '../../variables' as *;
+
+.becomeLandlord {
+  height: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px;
+  box-sizing: border-box;
+  gap: 8px;
+
+  .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+
+    .description {
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 17px;
+      margin: 8px 0 16px;
+    }
+
+    // TODO: remove after everything is replaced with custom components
+    .nativeControl {
+      width: 100%;
+      margin-top: 6px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #d8d8da;
+      font-family: $font-family;
+      box-sizing: border-box;
+    }
+    .meta {
+      margin: 0;
+      color: $info-text-color;
+      font-size: 12px;
+    }
+    .error {
+      margin: 0;
+      font-size: 12px;
+      color: $error-color;
+    }
+
+    .legal {
+      border: 1px solid #d8d8da;
+      border-radius: 10px;
+      padding: 12px;
+      margin: 0;
+    }
+
+    .terms {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+
+      input {
+        width: 16px;
+        margin: 0;
+      }
+    }
+
+    .link {
+      color: $link-color;
+      font-size: 13px;
+      text-decoration: none;
+    }
+  }
+
+  footer {
+    position: sticky;
+    bottom: 0;
+    padding: 0 0 16px;
+    background: $background-color;
+
+    @media (min-width: 768px) {
+      border-bottom-left-radius: 13px;
+      border-bottom-right-radius: 13px;
+    }
+  }
+}
