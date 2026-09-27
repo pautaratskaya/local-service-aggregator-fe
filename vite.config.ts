@@ -7,13 +7,36 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://62.238.112.250:8080',
+        target: 'https://beautibaza.duckdns.org',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path,
         configure: (proxy) => {
           proxy.on('proxyReq', (proxyReq) => {
             // Remove CORS-related headers to avoid backend CORS issues
+            proxyReq.removeHeader('origin');
+            proxyReq.removeHeader('referer');
+            console.log('Proxying request to:', proxyReq.path);
+          });
+          proxy.on('proxyRes', (proxyRes) => {
+            console.log(
+              'Proxy response:',
+              proxyRes.statusCode,
+              proxyRes.statusMessage
+            );
+          });
+          proxy.on('error', (err) => {
+            console.log('Proxy error:', err);
+          });
+        },
+      },
+      '/landlord': {
+        target: 'https://beautibaza.duckdns.org',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path,
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
             proxyReq.removeHeader('origin');
             proxyReq.removeHeader('referer');
             console.log('Proxying request to:', proxyReq.path);
