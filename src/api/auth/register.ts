@@ -15,6 +15,7 @@ export interface RegisterRequest {
   phone: string;
   firstName: string;
   lastName: string;
+  smsCode: string;
 }
 
 export interface RegisterResponse extends User {

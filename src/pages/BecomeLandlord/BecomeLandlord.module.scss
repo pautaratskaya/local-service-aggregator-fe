@@ -23,16 +23,6 @@
       margin: 8px 0 16px;
     }
 
-    // TODO: remove after everything is replaced with custom components
-    .nativeControl {
-      width: 100%;
-      margin-top: 6px;
-      padding: 10px 12px;
-      border-radius: 10px;
-      border: 1px solid #d8d8da;
-      font-family: $font-family;
-      box-sizing: border-box;
-    }
     .meta {
       margin: 0;
       color: $info-text-color;
@@ -42,13 +32,6 @@
       margin: 0;
       font-size: 12px;
       color: $error-color;
-    }
-
-    .legal {
-      border: 1px solid #d8d8da;
-      border-radius: 10px;
-      padding: 12px;
-      margin: 0;
     }
 
     .terms {

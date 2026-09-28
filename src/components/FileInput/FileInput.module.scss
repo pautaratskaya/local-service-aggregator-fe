@@ -36,7 +36,7 @@
     justify-content: center;
     height: 40px;
     padding: 0 20px;
-    border: none;
+    border: 1px solid #e3e4e5;
     border-radius: 50px;
     font-size: 14px;
     font-weight: 500;
@@ -44,13 +44,15 @@
     cursor: pointer;
     transition:
       background-color 0.2s,
+      border-color 0.2s,
       color 0.2s,
       transform 0.1s;
-    background-color: $secondary-button-background-color;
+    background-color: $background-color;
     color: $secondary-button-text-color;
 
     &:hover {
       background-color: $secondary-button-hover-background-color;
+      border-color: #d8d8da;
       color: $secondary-button-hover-text-color;
     }
 
@@ -62,6 +64,7 @@
   .hiddenInput:disabled + .pickButton {
     cursor: not-allowed;
     background-color: $secondary-button-disabled-background-color;
+    border-color: #e3e4e5;
     color: $secondary-button-disabled-text-color;
     pointer-events: none;
   }

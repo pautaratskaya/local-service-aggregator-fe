@@ -16,7 +16,7 @@ const CODE_LENGTH = 6;
 const RESEND_CODE_TIMER = 60;
 
 export type LoginNextPayload =
-  | { isExistingUser?: false }
+  | { isExistingUser?: false; smsCode: string }
   | { isExistingUser: true; roles: UserRole[] };
 
 interface LoginCodeProps {
@@ -75,7 +75,7 @@ function LoginCode({ onNext, onBack, phone }: LoginCodeProps) {
       if (err instanceof AuthError) {
         // Handle specific error types
         if (err.type === LOGIN_ERROR_TYPES.USER_NOT_FOUND) {
-          onNext({ isExistingUser: false });
+          onNext({ isExistingUser: false, smsCode: code });
         } else {
           setError(err.message);
         }

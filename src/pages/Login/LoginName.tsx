@@ -11,11 +11,12 @@ import styles from './Login.module.scss';
 
 interface LoginNameProps {
   phone: string;
+  smsCode: string;
   onNext: (userData: { firstName: string; lastName: string }) => void;
   onBackToPhone: () => void;
 }
 
-function LoginName({ phone, onNext, onBackToPhone }: LoginNameProps) {
+function LoginName({ phone, smsCode, onNext, onBackToPhone }: LoginNameProps) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -38,6 +39,7 @@ function LoginName({ phone, onNext, onBackToPhone }: LoginNameProps) {
         phone,
         firstName: firstName.trim(),
         lastName: lastName.trim(),
+        smsCode,
       });
 
       // TODO: review this

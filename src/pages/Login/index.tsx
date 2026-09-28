@@ -25,6 +25,7 @@ type LoginStep = (typeof LOGIN_STEPS)[keyof typeof LOGIN_STEPS];
 function Login() {
   const [step, setStep] = useState<LoginStep>(LOGIN_STEPS.Welcome);
   const [phone, setPhone] = useState('');
+  const [smsCode, setSmsCode] = useState('');
 
   const selectedRole = useAuthStore((state) => state.selectedRole);
   const user = useAuthStore((state) => state.user);
@@ -40,6 +41,7 @@ function Login() {
 
   const handleCodeNext = (payload: LoginNextPayload) => {
     if (!payload.isExistingUser) {
+      setSmsCode(payload.smsCode);
       setStep(LOGIN_STEPS.Name);
       return;
     }
@@ -90,6 +92,7 @@ function Login() {
       {step === LOGIN_STEPS.Name && (
         <LoginName
           phone={phone}
+          smsCode={smsCode}
           onNext={handleNameNext}
           onBackToPhone={() => setStep(LOGIN_STEPS.Phone)}
         />
