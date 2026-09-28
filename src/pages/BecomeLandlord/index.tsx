@@ -7,7 +7,7 @@ import TextInput from '../../components/TextInput';
 import TextareaInput from '../../components/TextareaInput';
 import SelectInput from '../../components/SelectInput';
 import FileInput from '../../components/FileInput';
-// import { landlordService } from '../../api/landlord/landlordService';
+import { landlordService } from '../../api/landlord/landlordService';
 import { LANDLORD_PHOTO_CONFIG } from '../../api/landlord/submitApplication';
 import { useAuthStore } from '../../stores/authStore';
 import {
@@ -15,8 +15,10 @@ import {
   type MinRentalDurationMinutes,
   type LandlordLegalInfo,
 } from '../../types/landlord';
-import WorkingHoursInput from // WORKING_DAYS,
-'../../components/WorkingHoursInput';
+import WorkingHoursInput, {
+  WORKING_DAYS,
+} from '../../components/WorkingHoursInput';
+import LegalInfoInput from '../../components/LegalInfoInput';
 import styles from './BecomeLandlord.module.scss';
 
 const PLACE_TYPE_OPTIONS = [
@@ -26,15 +28,15 @@ const PLACE_TYPE_OPTIONS = [
   { value: 'Студия', label: 'Студия' },
 ];
 // TODO: confirm the format
-// const API_DAY_BY_UI_DAY: Record<string, string> = {
-//   Пн: 'MONDAY',
-//   Вт: 'TUESDAY',
-//   Ср: 'WEDNESDAY',
-//   Чт: 'THURSDAY',
-//   Пт: 'FRIDAY',
-//   Сб: 'SATURDAY',
-//   Вс: 'SUNDAY',
-// };
+const API_DAY_BY_UI_DAY: Record<string, string> = {
+  Пн: 'MONDAY',
+  Вт: 'TUESDAY',
+  Ср: 'WEDNESDAY',
+  Чт: 'THURSDAY',
+  Пт: 'FRIDAY',
+  Сб: 'SATURDAY',
+  Вс: 'SUNDAY',
+};
 
 const MIN_RENTAL_OPTIONS = [
   { value: String(MIN_RENTAL_DURATIONS.MINUTES_30), label: '30 мин' },
@@ -90,36 +92,32 @@ function BecomeLandlord() {
         throw new Error('Не найден токен авторизации');
       }
 
-      // TODO: review the mapping
-      // const workingDays = WORKING_DAYS.filter(
-      //   (day) => !daysOff.includes(day)
-      // ).map((day) => API_DAY_BY_UI_DAY[day]);
+      const workingDays = WORKING_DAYS.filter(
+        (day) => !daysOff.includes(day)
+      ).map((day) => API_DAY_BY_UI_DAY[day]);
 
-      // TODO: use real API
-      return Promise.resolve();
-
-      // return landlordService.submitApplication({
-      //   userId: user.id,
-      //   token,
-      //   roles: user.roles, // TODO: remove? check all the props
-      //   payload: {
-      //     placeName: placeName.trim(),
-      //     city: city.trim(),
-      //     address: address.trim(),
-      //     placeTypes: [placeType],
-      //     description: description.trim(),
-      //     workingHours: {
-      //       from: workFrom,
-      //       to: workTo,
-      //       daysOff,
-      //     },
-      //     workingDays,
-      //     minRentalDurationMinutes,
-      //     pricePerHour: Number(pricePerHour),
-      //     legalInfo,
-      //     photos,
-      //   },
-      // });
+      return landlordService.submitApplication({
+        userId: user.id,
+        token,
+        roles: user.roles,
+        payload: {
+          placeName: placeName.trim(),
+          city: city.trim(),
+          address: address.trim(),
+          placeTypes: [placeType],
+          description: description.trim(),
+          workingHours: {
+            from: workFrom,
+            to: workTo,
+            daysOff,
+          },
+          workingDays,
+          minRentalDurationMinutes,
+          pricePerHour: Number(pricePerHour),
+          legalInfo,
+          photos,
+        },
+      });
     },
     onSuccess: async () => {
       if (user) {
@@ -309,36 +307,15 @@ function BecomeLandlord() {
             files={photos}
             error={errors.photos}
           />
-          <fieldset className={styles.legal}>
-            <legend>Юридическая информация (опционально)</legend>
-            <label>
-              Название юр.лица/ИП
-              <input
-                className={styles.nativeControl}
-                value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
-              />
-            </label>
-            <label>
-              УНП/ОГРН
-              <input
-                className={styles.nativeControl}
-                value={registrationNumber}
-                onChange={(e) => setRegistrationNumber(e.target.value)}
-              />
-            </label>
-            <label>
-              Реквизиты
-              <textarea
-                className={styles.nativeControl}
-                value={bankDetails}
-                onChange={(e) => setBankDetails(e.target.value)}
-              />
-            </label>
-          </fieldset>
-          {errors.legalInfo && (
-            <p className={styles.error}>{errors.legalInfo}</p>
-          )}
+          <LegalInfoInput
+            companyName={companyName}
+            registrationNumber={registrationNumber}
+            bankDetails={bankDetails}
+            onCompanyNameChange={setCompanyName}
+            onRegistrationNumberChange={setRegistrationNumber}
+            onBankDetailsChange={setBankDetails}
+            error={errors.legalInfo}
+          />
           <label className={styles.terms}>
             <input
               type="checkbox"

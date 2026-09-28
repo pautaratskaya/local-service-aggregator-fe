@@ -61,6 +61,12 @@
     overflow-wrap: break-word;
   }
 
+  .landlordStatus {
+    margin: 0 0 16px;
+    color: $info-text-color;
+    font-size: 14px;
+  }
+
   .actions {
     display: flex;
     flex-direction: column;
