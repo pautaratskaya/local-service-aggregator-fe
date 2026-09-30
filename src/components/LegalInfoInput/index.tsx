@@ -19,36 +19,37 @@ function LegalInfoInput({
   onBankDetailsChange,
   error,
 }: LegalInfoInputProps) {
+  const titleText = error || 'Юридическая информация (опционально)';
+
   return (
-    <div className={styles.legalInfoInput}>
-      <fieldset className={styles.legal}>
-        <legend>Юридическая информация (опционально)</legend>
-        <label>
-          Название юр.лица/ИП
-          <input
-            className={styles.control}
-            value={companyName}
-            onChange={(e) => onCompanyNameChange(e.target.value)}
-          />
-        </label>
-        <label>
-          УНП/ОГРН
-          <input
-            className={styles.control}
-            value={registrationNumber}
-            onChange={(e) => onRegistrationNumberChange(e.target.value)}
-          />
-        </label>
-        <label>
-          Реквизиты
-          <textarea
-            className={styles.control}
-            value={bankDetails}
-            onChange={(e) => onBankDetailsChange(e.target.value)}
-          />
-        </label>
-      </fieldset>
-      {error && <p className={styles.error}>{error}</p>}
+    <div
+      className={`${styles.legalInfoInput} ${error ? styles.errorState : ''}`}
+    >
+      <span className={styles.title}>{titleText}</span>
+      <label className={styles.field}>
+        <span className={styles.fieldLabel}>Название юр.лица/ИП</span>
+        <input
+          value={companyName}
+          onChange={(e) => onCompanyNameChange(e.target.value)}
+          aria-invalid={Boolean(error)}
+        />
+      </label>
+      <label className={styles.field}>
+        <span className={styles.fieldLabel}>УНП/ОГРН</span>
+        <input
+          value={registrationNumber}
+          onChange={(e) => onRegistrationNumberChange(e.target.value)}
+          aria-invalid={Boolean(error)}
+        />
+      </label>
+      <label className={styles.field}>
+        <span className={styles.fieldLabel}>Реквизиты</span>
+        <textarea
+          value={bankDetails}
+          onChange={(e) => onBankDetailsChange(e.target.value)}
+          aria-invalid={Boolean(error)}
+        />
+      </label>
     </div>
   );
 }

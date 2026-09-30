@@ -34,18 +34,8 @@
       color: $error-color;
     }
 
-    .terms {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-
-      input {
-        width: 16px;
-        margin: 0;
-      }
-    }
-
     .link {
+      margin-top: 10px;
       color: $link-color;
       font-size: 13px;
       text-decoration: none;

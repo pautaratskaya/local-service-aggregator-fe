@@ -55,36 +55,50 @@
     }
   }
 
-  .daysOff {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
+  .days {
+    display: flex;
+    flex-direction: column;
     gap: 8px;
     margin-top: 12px;
-  }
 
-  .day {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    min-height: 32px;
-    padding: 4px 8px;
-    border-radius: 10px;
-    background-color: $background-color;
-    font-size: 13px;
-    font-weight: 500;
-    color: $text-color;
-    cursor: pointer;
-
-    input {
-      position: absolute;
-      opacity: 0;
-      width: 0;
-      height: 0;
+    .daysLabel {
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.2;
     }
 
-    &.dayOff {
-      background-color: $secondary-button-hover-background-color;
+    .dayList {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .day {
+      display: flex;
+      flex: 1 0 55px;
+      align-items: center;
+      justify-content: center;
+      min-width: 55px;
+      min-height: 36px;
+      padding: 4px 8px;
+      border-radius: 10px;
+      background-color: $background-color;
+      font-size: 13px;
+      font-weight: 500;
+      color: $placeholder-color;
+      cursor: pointer;
+
+      input {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      &.daySelected {
+        background-color: $cta-button-background-color;
+        color: $cta-button-text-color;
+      }
     }
   }
 }

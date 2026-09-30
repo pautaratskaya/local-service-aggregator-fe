@@ -100,18 +100,7 @@ function LoginCode({ onNext, onBack, phone }: LoginCodeProps) {
         code,
       });
 
-      // Save user data and token
-      setAuth(
-        {
-          id: response.id,
-          phone: response.phone,
-          firstName: response.firstName,
-          lastName: response.lastName,
-          roles: response.roles,
-          createdAt: response.createdAt,
-        },
-        response.token
-      );
+      await setAuth(response.id, response.token);
 
       onNext({ isExistingUser: true, roles: response.roles });
     } catch (err) {

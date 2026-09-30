@@ -3,7 +3,6 @@ import {
   type LandlordApplication,
   type SubmitLandlordApplicationPayload,
 } from '../../types/landlord';
-import { USER_ROLES, type UserRole } from '../../types/user';
 import { API_BASE_URL } from '../config';
 import { LANDLORD_ERROR_TYPES, LandlordError } from './types';
 import { storeApplication } from './storage';
@@ -18,7 +17,6 @@ export const LANDLORD_PHOTO_CONFIG = {
 export interface SubmitLandlordApplicationRequest {
   userId: number;
   token: string;
-  roles: UserRole[];
   payload: SubmitLandlordApplicationPayload;
 }
 
@@ -64,16 +62,9 @@ function validatePayload(payload: SubmitLandlordApplicationPayload): void {
   }
 }
 
-function getEndpoint(roles: UserRole[]): string {
-  return roles.includes(USER_ROLES.LANDLORD)
-    ? '/landlord/add-workspace'
-    : '/landlord/request-landlord';
-}
-
 export async function submitApplication({
   userId,
   token,
-  roles,
   payload,
 }: SubmitLandlordApplicationRequest): Promise<LandlordApplication> {
   validatePayload(payload);
@@ -119,9 +110,7 @@ export async function submitApplication({
     formData.append('photos', photo);
   });
 
-  const endpoint = getEndpoint(roles);
-
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+  const response = await fetch(`${API_BASE_URL}/landlord/request-landlord`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,

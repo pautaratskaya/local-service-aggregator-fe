@@ -1,3 +1,5 @@
+import type { LandlordApplicationStatus } from './landlord';
+
 export interface User {
   id: number;
   phone: string;
@@ -5,6 +7,7 @@ export interface User {
   lastName: string;
   roles: UserRole[];
   createdAt: string;
+  landlordRoleStatus: LandlordApplicationStatus;
 }
 
 export const USER_ROLES = {

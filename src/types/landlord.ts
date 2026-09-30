@@ -1,6 +1,6 @@
 export const LANDLORD_APPLICATION_STATUSES = {
-  DRAFT: 'DRAFT',
-  PENDING_REVIEW: 'PENDING_REVIEW',
+  NO: 'NO',
+  WAITING_APPROVAL: 'WAITING_APPROVAL',
   APPROVED: 'APPROVED',
   REJECTED: 'REJECTED',
 } as const;
@@ -32,7 +32,6 @@ export interface LandlordLegalInfo {
 export interface LandlordWorkingHours {
   from: string;
   to: string;
-  daysOff: string[];
 }
 
 export interface LandlordApplicationFormData {

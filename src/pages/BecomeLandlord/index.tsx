@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Button from '../../components/Button';
 import Modal from '../../components/Modal';
@@ -16,10 +16,12 @@ import {
   type LandlordLegalInfo,
 } from '../../types/landlord';
 import WorkingHoursInput, {
-  WORKING_DAYS,
+  DEFAULT_WORKING_DAYS,
 } from '../../components/WorkingHoursInput';
 import LegalInfoInput from '../../components/LegalInfoInput';
+import CheckboxInput from '../../components/CheckboxInput';
 import styles from './BecomeLandlord.module.scss';
+import { queryClient } from '../../providers/QueryProvider';
 
 const PLACE_TYPE_OPTIONS = [
   { value: 'Парикмахерское кресло', label: 'Парикмахерское кресло' },
@@ -47,11 +49,10 @@ const MIN_RENTAL_OPTIONS = [
 type Errors = Partial<Record<string, string>>;
 
 function BecomeLandlord() {
-  const user = useAuthStore((state) => state.user);
+  const userId = useAuthStore((state) => state.userId);
   const token = useAuthStore((state) => state.token);
   const navigate = useNavigate();
   const location = useLocation();
-  const queryClient = useQueryClient();
 
   const [placeName, setPlaceName] = useState('');
   const [city, setCity] = useState('');
@@ -60,7 +61,8 @@ function BecomeLandlord() {
   const [description, setDescription] = useState('');
   const [workFrom, setWorkFrom] = useState('09:00');
   const [workTo, setWorkTo] = useState('21:00');
-  const [daysOff, setDaysOff] = useState<string[]>([]);
+  const [workingDays, setWorkingDays] =
+    useState<string[]>(DEFAULT_WORKING_DAYS);
   const [minRentalDurationMinutes, setMinRentalDurationMinutes] =
     useState<MinRentalDurationMinutes>(MIN_RENTAL_DURATIONS.MINUTES_60);
   const [pricePerHour, setPricePerHour] = useState('');
@@ -85,21 +87,16 @@ function BecomeLandlord() {
 
   const submitMutation = useMutation({
     mutationFn: () => {
-      if (!user) {
+      if (!userId) {
         throw new Error('Требуется авторизация');
       }
       if (!token) {
         throw new Error('Не найден токен авторизации');
       }
 
-      const workingDays = WORKING_DAYS.filter(
-        (day) => !daysOff.includes(day)
-      ).map((day) => API_DAY_BY_UI_DAY[day]);
-
       return landlordService.submitApplication({
-        userId: user.id,
+        userId,
         token,
-        roles: user.roles,
         payload: {
           placeName: placeName.trim(),
           city: city.trim(),
@@ -109,9 +106,8 @@ function BecomeLandlord() {
           workingHours: {
             from: workFrom,
             to: workTo,
-            daysOff,
           },
-          workingDays,
+          workingDays: workingDays.map((day) => API_DAY_BY_UI_DAY[day]),
           minRentalDurationMinutes,
           pricePerHour: Number(pricePerHour),
           legalInfo,
@@ -120,11 +116,10 @@ function BecomeLandlord() {
       });
     },
     onSuccess: async () => {
-      if (user) {
-        await queryClient.invalidateQueries({
-          queryKey: ['landlord-application', user.id],
-        });
-      }
+      await queryClient.invalidateQueries({
+        queryKey: ['user-details', userId],
+      });
+
       const background = location.state?.background;
       navigate(background?.pathname || '/');
     },
@@ -141,7 +136,9 @@ function BecomeLandlord() {
     if (description.trim().length > 1000) {
       nextErrors.description = 'Описание должно быть до 1000 символов';
     }
-    if (!workFrom || !workTo || workFrom >= workTo) {
+    if (workingDays.length === 0) {
+      nextErrors.workingHours = 'Выберите хотя бы один рабочий день';
+    } else if (!workFrom || !workTo || workFrom >= workTo) {
       nextErrors.workingHours =
         'Проверьте время работы: начало должно быть раньше окончания';
     }
@@ -193,8 +190,8 @@ function BecomeLandlord() {
     setPhotos((prev) => prev.filter((_, photoIndex) => photoIndex !== index));
   };
 
-  const onDaysOffToggle = (day: string) => {
-    setDaysOff((prev) =>
+  const onWorkingDayToggle = (day: string) => {
+    setWorkingDays((prev) =>
       prev.includes(day)
         ? prev.filter((value) => value !== day)
         : [...prev, day]
@@ -266,10 +263,10 @@ function BecomeLandlord() {
             required
             workFrom={workFrom}
             workTo={workTo}
-            daysOff={daysOff}
+            workingDays={workingDays}
             onWorkFromChange={setWorkFrom}
             onWorkToChange={setWorkTo}
-            onDaysOffToggle={onDaysOffToggle}
+            onWorkingDayToggle={onWorkingDayToggle}
             error={errors.workingHours}
           />
           <SelectInput
@@ -316,14 +313,13 @@ function BecomeLandlord() {
             onBankDetailsChange={setBankDetails}
             error={errors.legalInfo}
           />
-          <label className={styles.terms}>
-            <input
-              type="checkbox"
-              checked={termsAccepted}
-              onChange={(e) => setTermsAccepted(e.target.checked)}
-            />
-            Я принимаю условия использования платформы для арендодателей
-          </label>
+          <CheckboxInput
+            label="Я принимаю условия использования платформы для арендодателей"
+            required
+            checked={termsAccepted}
+            onChange={setTermsAccepted}
+            error={errors.termsAccepted}
+          />
           <a
             href="#"
             onClick={(e) => e.preventDefault()}
@@ -331,9 +327,6 @@ function BecomeLandlord() {
           >
             Открыть условия использования
           </a>
-          {errors.termsAccepted && (
-            <p className={styles.error}>{errors.termsAccepted}</p>
-          )}
           {submitMutation.error && (
             <p className={styles.error}>
               {submitMutation.error instanceof Error

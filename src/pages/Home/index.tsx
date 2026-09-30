@@ -1,14 +1,13 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import styles from './Home.module.scss';
 import Button from '../../components/Button';
 import { useAuthStore } from '../../stores/authStore';
 import { getUserRoleLabel, USER_ROLES } from '../../types/user';
-import { landlordService } from '../../api/landlord/landlordService';
 import { LANDLORD_APPLICATION_STATUSES } from '../../types/landlord';
+import { useCurrentUser } from '../../hooks/useCurrentUser';
 
 function getLandlordStatusText(status: string): string {
-  if (status === LANDLORD_APPLICATION_STATUSES.PENDING_REVIEW) {
+  if (status === LANDLORD_APPLICATION_STATUSES.WAITING_APPROVAL) {
     return 'Ваша заявка на создание помещения принята и находится в статусе На рассмотрении';
   }
   if (status === LANDLORD_APPLICATION_STATUSES.APPROVED) {
@@ -23,16 +22,13 @@ function getLandlordStatusText(status: string): string {
 function Home() {
   const navigate = useNavigate();
   const location = useLocation();
-  const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
+  const { data: user } = useCurrentUser();
   const isLoggedIn = !!user;
-  const { data: landlordApplication } = useQuery({
-    queryKey: ['landlord-application', user?.id],
-    queryFn: () => landlordService.getMyApplication(user!.id),
-    enabled: !!user,
-  });
-  const landlordStatusText = landlordApplication
-    ? getLandlordStatusText(landlordApplication.status)
+
+  const landlordRoleStatus = user?.landlordRoleStatus;
+  const landlordStatusText = landlordRoleStatus
+    ? getLandlordStatusText(landlordRoleStatus)
     : '';
 
   const onLoginClick = () => {
@@ -55,7 +51,7 @@ function Home() {
 
   return (
     <div className={styles.home}>
-      {isLoggedIn && user && (
+      {isLoggedIn && (
         <header className={styles.userHeader}>
           <div className={styles.rolesSection} aria-label="Роли пользователя">
             <span className={styles.rolesHeading}>Роли</span>
@@ -71,13 +67,15 @@ function Home() {
       <div className={styles.mainContent}>
         {isLoggedIn ? (
           <>
-            <h1>Привет, {user?.firstName}!</h1>
-            {landlordStatusText && (
+            <h1>Привет, {user.firstName}!</h1>
+            {landlordStatusText !== LANDLORD_APPLICATION_STATUSES.NO && (
               <p className={styles.landlordStatus}>{landlordStatusText}</p>
             )}
             <div className={styles.actions}>
               {!user.roles.includes(USER_ROLES.LANDLORD) &&
-                !landlordApplication && (
+                (landlordRoleStatus === LANDLORD_APPLICATION_STATUSES.NO ||
+                  landlordRoleStatus ===
+                    LANDLORD_APPLICATION_STATUSES.REJECTED) && (
                   <Button onClick={onBecomeLandlordClick} cta>
                     Стать арендодателем
                   </Button>

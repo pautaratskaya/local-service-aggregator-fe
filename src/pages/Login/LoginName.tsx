@@ -42,19 +42,7 @@ function LoginName({ phone, smsCode, onNext, onBackToPhone }: LoginNameProps) {
         smsCode,
       });
 
-      // TODO: review this
-      // Save user data and token
-      setAuth(
-        {
-          id: response.id,
-          phone: response.phone,
-          firstName: response.firstName,
-          lastName: response.lastName,
-          roles: response.roles,
-          createdAt: response.createdAt,
-        },
-        response.token
-      );
+      await setAuth(response.id, response.token);
 
       onNext({ firstName: firstName.trim(), lastName: lastName.trim() });
     } catch (err) {

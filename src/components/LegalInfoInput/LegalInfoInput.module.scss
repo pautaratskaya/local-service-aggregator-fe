@@ -3,27 +3,58 @@
 .legalInfoInput {
   width: 100%;
   margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-sizing: border-box;
+  padding: 10px 16px;
+  background-color: $input-background-color;
+  color: $placeholder-color;
+  border-radius: 16px;
+  border: none;
 
-  .legal {
-    border: 1px solid #d8d8da;
-    border-radius: 10px;
-    padding: 12px;
-    margin: 0;
-  }
-
-  .control {
-    width: 100%;
-    margin-top: 6px;
-    padding: 10px 12px;
-    border-radius: 10px;
-    border: 1px solid #d8d8da;
-    font-family: $font-family;
-    box-sizing: border-box;
-  }
-
-  .error {
-    margin: 6px 0 0;
-    font-size: 12px;
+  &.errorState {
+    border: 1px solid rgba($error-color, 0.7);
+    background-color: rgba($error-color, 0.08);
     color: $error-color;
+  }
+
+  .title {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.2;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    .fieldLabel {
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.2;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: none;
+      background: transparent;
+      font-size: 20px;
+      font-weight: 600;
+      color: $text-color;
+      outline: none;
+      font-family: $font-family;
+    }
+
+    input {
+      min-height: 24px;
+    }
+
+    textarea {
+      min-height: 72px;
+      resize: none;
+    }
   }
 }

@@ -9,6 +9,7 @@ import LoginChooseRole from './LoginChooseRole';
 import { useAuthStore } from '../../stores/authStore';
 import type { UserRole } from '../../types/user';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useCurrentUser } from '../../hooks/useCurrentUser';
 
 const LOGIN_STEPS = {
   Welcome: 'welcome',
@@ -27,12 +28,16 @@ function Login() {
   const [phone, setPhone] = useState('');
   const [smsCode, setSmsCode] = useState('');
 
-  const selectedRole = useAuthStore((state) => state.selectedRole);
-  const user = useAuthStore((state) => state.user);
   const setSelectedRole = useAuthStore((state) => state.setSelectedRole);
   const navigate = useNavigate();
   const location = useLocation();
   const background = location.state?.background;
+
+  const {
+    data: user,
+    isFetching: isUserFetching,
+    isError: isUserError,
+  } = useCurrentUser();
 
   const handlePhoneNext = (phoneValue: string) => {
     setPhone(phoneValue);
@@ -63,15 +68,7 @@ function Login() {
   };
 
   const handleDone = () => {
-    // TODO: make sure to update the page with user info
-    console.log('===> background', background);
     navigate(background?.pathname || '/');
-
-    console.log('===> Login complete:', {
-      phone,
-      user,
-      selectedRole,
-    });
   };
 
   return (
@@ -98,14 +95,21 @@ function Login() {
         />
       )}
       {step === LOGIN_STEPS.ProfileCreation && (
-        <LoginLoading onNext={handleDone} successMessage="Готово!" />
+        <LoginLoading
+          onNext={handleDone}
+          isLoading={isUserFetching}
+          isError={isUserError}
+          successMessage="Готово!"
+        />
       )}
-      {step === LOGIN_STEPS.ChooseRole && (
+      {step === LOGIN_STEPS.ChooseRole && user && (
         <LoginChooseRole onNext={handleChooseRoleNext} user={user!} />
       )}
       {step === LOGIN_STEPS.Authorization && (
         <LoginLoading
           onNext={handleDone}
+          isLoading={isUserFetching}
+          isError={isUserError}
           successMessage="С возвращением,"
           highlightedText={`${user?.firstName}!`}
         />
