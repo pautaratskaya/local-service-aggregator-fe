@@ -95,7 +95,6 @@ function BecomeLandlord() {
       }
 
       return landlordService.submitApplication({
-        userId,
         token,
         payload: {
           placeName: placeName.trim(),

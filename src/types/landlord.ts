@@ -56,12 +56,8 @@ export interface SubmitLandlordApplicationPayload extends Omit<
 }
 
 export interface LandlordApplication {
-  id: number | string;
-  userId: number;
-  status: LandlordApplicationStatus;
-  createdAt: string;
-  updatedAt: string;
-  formData: Omit<SubmitLandlordApplicationPayload, 'photos'> & {
-    photoUrls: string[];
-  };
+  id: number;
+  name: string;
+  city: string;
+  photoUrls: string[];
 }

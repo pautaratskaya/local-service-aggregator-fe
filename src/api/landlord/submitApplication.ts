@@ -1,11 +1,9 @@
 import {
-  LANDLORD_APPLICATION_STATUSES,
   type LandlordApplication,
   type SubmitLandlordApplicationPayload,
 } from '../../types/landlord';
 import { API_BASE_URL } from '../config';
 import { LANDLORD_ERROR_TYPES, LandlordError } from './types';
-import { storeApplication } from './storage';
 
 export const LANDLORD_PHOTO_CONFIG = {
   MIN_COUNT: 3,
@@ -15,7 +13,6 @@ export const LANDLORD_PHOTO_CONFIG = {
 } as const;
 
 export interface SubmitLandlordApplicationRequest {
-  userId: number;
   token: string;
   payload: SubmitLandlordApplicationPayload;
 }
@@ -63,7 +60,6 @@ function validatePayload(payload: SubmitLandlordApplicationPayload): void {
 }
 
 export async function submitApplication({
-  userId,
   token,
   payload,
 }: SubmitLandlordApplicationRequest): Promise<LandlordApplication> {
@@ -147,35 +143,5 @@ export async function submitApplication({
     );
   }
 
-  const apiResponse = (await response.json()) as {
-    id: number;
-    name: string;
-    city: string;
-    photoUrls: string[];
-  };
-
-  const now = new Date().toISOString();
-  const application: LandlordApplication = {
-    id: apiResponse.id,
-    userId,
-    status: LANDLORD_APPLICATION_STATUSES.PENDING_REVIEW,
-    createdAt: now,
-    updatedAt: now,
-    formData: {
-      placeName: payload.placeName,
-      city: payload.city,
-      address: payload.address,
-      placeTypes: payload.placeTypes,
-      description: payload.description,
-      workingHours: payload.workingHours,
-      workingDays: payload.workingDays,
-      minRentalDurationMinutes: payload.minRentalDurationMinutes,
-      pricePerHour: payload.pricePerHour,
-      legalInfo: payload.legalInfo,
-      photoUrls: apiResponse.photoUrls ?? [],
-    },
-  };
-
-  storeApplication(application);
-  return application;
+  return response.json() as Promise<LandlordApplication>;
 }
