@@ -14,6 +14,7 @@ export const USER_ROLES = {
   CUSTOMER: 'CUSTOMER',
   MASTER: 'MASTER',
   LANDLORD: 'LANDLORD',
+  ADMIN: 'ADMINISTRATOR',
 } as const;
 
 export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES];
@@ -22,6 +23,7 @@ export const UserRoleLabels: Record<UserRole, string> = {
   [USER_ROLES.CUSTOMER]: 'Клиент',
   [USER_ROLES.MASTER]: 'Мастер',
   [USER_ROLES.LANDLORD]: 'Арендодатель',
+  [USER_ROLES.ADMIN]: 'Админ',
 };
 
 export function getUserRoleLabel(role: UserRole): string {

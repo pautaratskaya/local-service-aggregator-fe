@@ -7,7 +7,7 @@ import LoginCode, { type LoginNextPayload } from './LoginCode';
 import LoginLoading from './LoginLoading';
 import LoginChooseRole from './LoginChooseRole';
 import { useAuthStore } from '../../stores/authStore';
-import type { UserRole } from '../../types/user';
+import { USER_ROLES, type UserRole } from '../../types/user';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useCurrentUser } from '../../hooks/useCurrentUser';
 
@@ -51,7 +51,7 @@ function Login() {
       return;
     }
 
-    const { roles } = payload;
+    const roles = payload.roles.filter((role) => role !== USER_ROLES.ADMIN);
     setStep(
       roles.length > 1 ? LOGIN_STEPS.ChooseRole : LOGIN_STEPS.Authorization
     );

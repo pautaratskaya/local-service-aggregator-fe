@@ -2,7 +2,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './Home.module.scss';
 import Button from '../../components/Button';
 import { useAuthStore } from '../../stores/authStore';
-import { getUserRoleLabel, USER_ROLES } from '../../types/user';
+import { USER_ROLES } from '../../types/user';
 import { LANDLORD_APPLICATION_STATUSES } from '../../types/landlord';
 import { useCurrentUser } from '../../hooks/useCurrentUser';
 
@@ -51,19 +51,6 @@ function Home() {
 
   return (
     <div className={styles.home}>
-      {isLoggedIn && (
-        <header className={styles.userHeader}>
-          <div className={styles.rolesSection} aria-label="Роли пользователя">
-            <span className={styles.rolesHeading}>Роли</span>
-            <ul className={styles.rolesList}>
-              {user.roles.map((role) => (
-                <li key={role}>{getUserRoleLabel(role)}</li>
-              ))}
-            </ul>
-          </div>
-        </header>
-      )}
-
       <div className={styles.mainContent}>
         {isLoggedIn ? (
           <>

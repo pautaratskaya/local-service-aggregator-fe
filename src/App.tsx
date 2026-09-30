@@ -5,10 +5,14 @@ import {
   useLocation,
   useNavigate,
   Navigate,
+  Outlet,
 } from 'react-router-dom';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import BecomeLandlord from './pages/BecomeLandlord';
+import Admin from './pages/Admin';
+import AdminApplications from './pages/Admin/Applications';
+import Header from './components/Header';
 import { USER_ROLES } from './types/user';
 import { QueryProvider } from './providers/QueryProvider';
 import PageLoader from './components/PageLoader';
@@ -41,12 +45,27 @@ function BecomeLandlordRoute() {
   return <BecomeLandlord />;
 }
 
+function AdminRoute() {
+  const { data: user, isLoading: isUserLoading } = useCurrentUser();
+
+  if (isUserLoading) {
+    return null;
+  }
+
+  if (!user?.roles.includes(USER_ROLES.ADMIN)) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <Outlet />;
+}
+
 function AppRoutes() {
   const location = useLocation();
   const navigate = useNavigate();
   const background = location.state?.background;
   const logout = useAuthStore((state) => state.logout);
   const {
+    data: user,
     isLoading: isUserLoading,
     isFetching: isUserFetching,
     isError: isUserError,
@@ -91,11 +110,20 @@ function AppRoutes() {
       {isUserLoading ? (
         <PageLoader />
       ) : (
-        <Routes location={background || location}>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Home />} />
-          <Route path="/become-landlord" element={<Home />} />
-        </Routes>
+        <div className="appShell">
+          {user && <Header user={user} />}
+          <div className="page">
+            <Routes location={background || location}>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Home />} />
+              <Route path="/become-landlord" element={<Home />} />
+              <Route path="/admin" element={<AdminRoute />}>
+                <Route index element={<Admin />} />
+                <Route path="applications" element={<AdminApplications />} />
+              </Route>
+            </Routes>
+          </div>
+        </div>
       )}
 
       {(background ||
