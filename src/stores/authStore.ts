@@ -1,3 +1,4 @@
+import { useSyncExternalStore } from 'react';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { queryClient } from '../providers/QueryProvider';
@@ -43,3 +44,11 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 );
+
+export function useAuthHydrated() {
+  return useSyncExternalStore(
+    (onStoreChange) => useAuthStore.persist.onFinishHydration(onStoreChange),
+    () => useAuthStore.persist.hasHydrated(),
+    () => false
+  );
+}

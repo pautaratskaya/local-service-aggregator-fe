@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import {
   BrowserRouter,
   Routes,
@@ -17,11 +18,16 @@ import { USER_ROLES } from './types/user';
 import { QueryProvider } from './providers/QueryProvider';
 import PageLoader from './components/PageLoader';
 import FetchErrorNotice from './components/FetchErrorNotice';
-import { isMissingUserError, useCurrentUser } from './hooks/useCurrentUser';
-import { useAuthStore } from './stores/authStore';
+import {
+  isMissingUserError,
+  isUnauthorizedUserError,
+  useCurrentUser,
+} from './hooks/useCurrentUser';
+import { useAuthHydrated, useAuthStore } from './stores/authStore';
 import './App.scss';
 
 const MISSING_USER_MESSAGE = 'Пользователь не найден';
+const INVALID_SESSION_MESSAGE = 'Сессия истекла. Войдите снова';
 
 function BecomeLandlordRoute() {
   const { data: user, isLoading: isUserLoading } = useCurrentUser();
@@ -64,6 +70,8 @@ function AppRoutes() {
   const navigate = useNavigate();
   const background = location.state?.background;
   const logout = useAuthStore((state) => state.logout);
+  const token = useAuthStore((state) => state.token);
+  const userId = useAuthStore((state) => state.userId);
   const {
     data: user,
     isLoading: isUserLoading,
@@ -73,6 +81,30 @@ function AppRoutes() {
     refetch: refetchUser,
   } = useCurrentUser();
   const userIsMissing = isMissingUserError(userError);
+  const authHydrated = useAuthHydrated();
+  const sessionIsInvalid =
+    isUnauthorizedUserError(userError) || (userId != null && !token);
+  // Remember if the user was already logged in when /login opened.
+  // Signing in on this screen must not redirect away from the success step.
+  const enteredLoginWhileAuthenticated = useRef<boolean | null>(null);
+
+  if (!authHydrated) {
+    return <PageLoader />;
+  }
+
+  if (!isUserLoading && !isUserError) {
+    if (location.pathname === '/login') {
+      if (enteredLoginWhileAuthenticated.current === null) {
+        enteredLoginWhileAuthenticated.current = !!user;
+      }
+    } else {
+      enteredLoginWhileAuthenticated.current = null;
+    }
+  }
+
+  const shouldLeaveLogin =
+    location.pathname === '/login' &&
+    enteredLoginWhileAuthenticated.current === true;
 
   if (userIsMissing) {
     return (
@@ -82,6 +114,19 @@ function AppRoutes() {
         onAction={() => {
           logout();
           navigate('/', { replace: true });
+        }}
+      />
+    );
+  }
+
+  if (sessionIsInvalid) {
+    return (
+      <FetchErrorNotice
+        message={INVALID_SESSION_MESSAGE}
+        actionLabel="Войти"
+        onAction={() => {
+          logout();
+          navigate('/login', { replace: true });
         }}
       />
     );
@@ -126,13 +171,17 @@ function AppRoutes() {
         </div>
       )}
 
-      {(background ||
-        location.pathname === '/login' ||
-        location.pathname === '/become-landlord') && (
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/become-landlord" element={<BecomeLandlordRoute />} />
-        </Routes>
+      {shouldLeaveLogin ? (
+        <Navigate to="/" replace />
+      ) : (
+        (background ||
+          location.pathname === '/login' ||
+          location.pathname === '/become-landlord') && (
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/become-landlord" element={<BecomeLandlordRoute />} />
+          </Routes>
+        )
       )}
     </>
   );

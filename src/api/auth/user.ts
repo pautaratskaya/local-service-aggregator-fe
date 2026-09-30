@@ -5,6 +5,7 @@ import { AuthError } from './types';
 
 export const GET_USER_ERROR_TYPES = {
   NOT_FOUND: 'NOT_FOUND',
+  UNAUTHORIZED: 'UNAUTHORIZED',
   ...COMMON_ERROR_TYPES,
 } as const;
 
@@ -13,6 +14,7 @@ export type GetUserErrorType =
 
 export interface GetUserRequest {
   userId: number;
+  token: string;
 }
 
 function getErrorInfo(status: number): {
@@ -20,6 +22,12 @@ function getErrorInfo(status: number): {
   message: string;
 } {
   switch (status) {
+    case 400:
+    case 401:
+      return {
+        type: GET_USER_ERROR_TYPES.UNAUTHORIZED,
+        message: 'Сессия истекла',
+      };
     case 404:
       return {
         type: GET_USER_ERROR_TYPES.NOT_FOUND,
@@ -39,7 +47,7 @@ export async function getUser(data: GetUserRequest): Promise<User> {
       method: 'GET',
       // credentials: 'include', // TODO: token
       headers: {
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${data.token}`,
       },
     });
 
