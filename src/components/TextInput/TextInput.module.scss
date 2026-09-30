@@ -2,6 +2,7 @@
 
 .textInput {
   width: 100%;
+  min-width: 0;
   height: 56px;
   margin-top: 16px;
   display: flex;
@@ -42,6 +43,7 @@
     color: $text-color;
     outline: none;
     font-family: $font-family;
+    min-width: 0;
 
     &::placeholder {
       color: $placeholder-color;
