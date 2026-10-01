@@ -2,7 +2,7 @@ import { useSyncExternalStore } from 'react';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { queryClient } from '../providers/QueryProvider';
-import { type UserRole } from '../types/user';
+import { USER_ROLES, type UserRole } from '../types/user';
 
 interface AuthState {
   selectedRole: UserRole | null;
@@ -27,7 +27,7 @@ export const useAuthStore = create<AuthState>()(
       ...initialState,
       setSelectedRole: (role) => set({ selectedRole: role }),
       setAuth: async (userId, token) => {
-        set({ userId, token });
+        set({ userId, token, selectedRole: USER_ROLES.CUSTOMER });
         await queryClient.invalidateQueries({
           queryKey: ['user-details', userId],
         });
@@ -38,8 +38,9 @@ export const useAuthStore = create<AuthState>()(
     {
       name: 'auth-storage',
       partialize: (state) => ({
-        userId: state.userId, // TODO: add selectedRole? or remove all?
+        userId: state.userId,
         token: state.token, // TODO: remove
+        selectedRole: state.selectedRole,
       }),
     }
   )

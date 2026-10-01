@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Button from '../../components/Button';
+import { useToast } from '../../components/Toast/toastContext';
 import Modal from '../../components/Modal';
 import TextInput from '../../components/TextInput';
 import TextareaInput from '../../components/TextareaInput';
@@ -43,6 +44,7 @@ function BecomeLandlord() {
   const token = useAuthStore((state) => state.token);
   const navigate = useNavigate();
   const location = useLocation();
+  const showToast = useToast();
 
   const [placeName, setPlaceName] = useState('');
   const [city, setCity] = useState('');
@@ -105,6 +107,7 @@ function BecomeLandlord() {
       });
     },
     onSuccess: async () => {
+      showToast('success', 'Заявка отправлена');
       await queryClient.invalidateQueries({
         queryKey: ['user-details', userId],
       });

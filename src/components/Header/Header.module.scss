@@ -40,10 +40,39 @@
     list-style: none;
 
     li {
-      padding: 3px 8px;
-      border-radius: 5px;
-      background: rgba($text-color, 0.06);
       overflow-wrap: anywhere;
+
+      button,
+      .adminRole {
+        padding: 3px 8px;
+        border: none;
+        border-radius: 5px;
+        font: inherit;
+        overflow-wrap: anywhere;
+      }
+
+      button {
+        color: inherit;
+        background: rgba($text-color, 0.06);
+        cursor: pointer;
+
+        &:hover {
+          background: rgba($text-color, 0.1);
+        }
+
+        &.selected {
+          color: $link-color;
+          background: rgba($link-color, 0.12);
+          font-weight: 600;
+        }
+      }
+
+      .adminRole {
+        display: inline-block;
+        color: $error-color;
+        background: rgba($error-color, 0.1);
+        cursor: default;
+      }
     }
   }
 

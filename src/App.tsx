@@ -15,6 +15,7 @@ import Admin from './pages/Admin';
 import AdminApplications from './pages/Admin/Applications';
 import Header from './components/Header';
 import { USER_ROLES } from './types/user';
+import { ToastProvider } from './components/Toast';
 import { QueryProvider } from './providers/QueryProvider';
 import PageLoader from './components/PageLoader';
 import FetchErrorNotice from './components/FetchErrorNotice';
@@ -190,9 +191,11 @@ function AppRoutes() {
 function App() {
   return (
     <QueryProvider>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
+      <ToastProvider>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </ToastProvider>
     </QueryProvider>
   );
 }
