@@ -12,6 +12,18 @@ export interface LandlordWorkspaceSummary {
   name: string;
   city: string;
   address: string;
+  kind: string;
+  description: string;
+  openTime: string;
+  closeTime: string;
+  workingDays: string[];
+  minRentMinutes: number;
+  pricePerHour: number;
+  legalName: string | null;
+  legalRegistrationNo: string | null;
+  legalDetails: string | null;
+  status: string;
+  createdAt: string;
   photos: LandlordWorkspacePhoto[];
 }
 

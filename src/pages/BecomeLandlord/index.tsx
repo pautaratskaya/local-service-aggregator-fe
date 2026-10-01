@@ -12,6 +12,7 @@ import { LANDLORD_PHOTO_CONFIG } from '../../api/landlord/submitApplication';
 import { useAuthStore } from '../../stores/authStore';
 import {
   MIN_RENTAL_DURATIONS,
+  toWeekdayApiValue,
   type MinRentalDurationMinutes,
   type LandlordLegalInfo,
 } from '../../types/landlord';
@@ -29,17 +30,6 @@ const PLACE_TYPE_OPTIONS = [
   { value: 'Массажный кабинет', label: 'Массажный кабинет' },
   { value: 'Студия', label: 'Студия' },
 ];
-// TODO: confirm the format
-const API_DAY_BY_UI_DAY: Record<string, string> = {
-  Пн: 'MONDAY',
-  Вт: 'TUESDAY',
-  Ср: 'WEDNESDAY',
-  Чт: 'THURSDAY',
-  Пт: 'FRIDAY',
-  Сб: 'SATURDAY',
-  Вс: 'SUNDAY',
-};
-
 const MIN_RENTAL_OPTIONS = [
   { value: String(MIN_RENTAL_DURATIONS.MINUTES_30), label: '30 мин' },
   { value: String(MIN_RENTAL_DURATIONS.MINUTES_60), label: '1 час' },
@@ -106,7 +96,7 @@ function BecomeLandlord() {
             from: workFrom,
             to: workTo,
           },
-          workingDays: workingDays.map((day) => API_DAY_BY_UI_DAY[day]),
+          workingDays: workingDays.map((day) => toWeekdayApiValue(day)),
           minRentalDurationMinutes,
           pricePerHour: Number(pricePerHour),
           legalInfo,

@@ -1,18 +1,18 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { adminService } from '../../api/admin/adminService';
-import Button from '../../components/Button';
 import FetchErrorNotice from '../../components/FetchErrorNotice';
 import PageLoader from '../../components/PageLoader';
 import { useAuthStore } from '../../stores/authStore';
 import { LANDLORD_APPLICATION_STATUSES } from '../../types/landlord';
+import WorkspaceRow from './WorkspaceRow';
 import styles from './Admin.module.scss';
 
 function AdminApplications() {
   const token = useAuthStore((state) => state.token);
   const queryClient = useQueryClient();
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
-  const reject = useMutation({
+  const rejectMutation = useMutation({
     mutationFn: (userId: number) => {
       if (!token) {
         throw new Error('Требуется авторизация');
@@ -24,7 +24,7 @@ function AdminApplications() {
       await queryClient.invalidateQueries({ queryKey: ['admin-landlords'] });
     },
   });
-  const approve = useMutation({
+  const approveMutation = useMutation({
     mutationFn: (userId: number) => {
       if (!token) {
         throw new Error('Требуется авторизация');
@@ -84,93 +84,24 @@ function AdminApplications() {
           {data.flatMap((request) =>
             request.workspaces.map((workspace) => {
               const itemKey = `${request.userId}-${workspace.id}`;
-              const isExpanded = expandedKey === itemKey;
-              const isDeciding = reject.isPending || approve.isPending;
 
               return (
-                <li key={itemKey}>
-                  <div className={styles.row}>
-                    <button
-                      type="button"
-                      className={styles.summary}
-                      aria-expanded={isExpanded}
-                      onClick={() =>
-                        setExpandedKey(isExpanded ? null : itemKey)
-                      }
-                    >
-                      {request.realName} — {workspace.name}
-                    </button>
-                    <div className={styles.actions}>
-                      <Button
-                        type="button"
-                        disabled={isDeciding}
-                        onClick={() => reject.mutate(request.userId)}
-                      >
-                        Отклонить
-                      </Button>
-                      <Button
-                        type="button"
-                        disabled={isDeciding}
-                        onClick={() => approve.mutate(request.userId)}
-                        cta
-                      >
-                        Одобрить
-                      </Button>
-                    </div>
-                  </div>
-                  {reject.isError && reject.variables === request.userId && (
-                    <p className={styles.actionError}>
-                      {reject.error instanceof Error
-                        ? reject.error.message
-                        : 'Не удалось отклонить заявку'}
-                    </p>
-                  )}
-                  {approve.isError && approve.variables === request.userId && (
-                    <p className={styles.actionError}>
-                      {approve.error instanceof Error
-                        ? approve.error.message
-                        : 'Не удалось одобрить заявку'}
-                    </p>
-                  )}
-                  {isExpanded && (
-                    <dl className={styles.details}>
-                      <div>
-                        <dt>Имя пользователя</dt>
-                        <dd>{request.realName}</dd>
-                      </div>
-                      <div>
-                        <dt>Название помещения</dt>
-                        <dd>{workspace.name}</dd>
-                      </div>
-                      <div>
-                        <dt>Телефон</dt>
-                        <dd>{request.phone}</dd>
-                      </div>
-                      <div>
-                        <dt>Город</dt>
-                        <dd>{workspace.city}</dd>
-                      </div>
-                      <div>
-                        <dt>Адрес</dt>
-                        <dd>{workspace.address}</dd>
-                      </div>
-                      {workspace.photos.length > 0 && (
-                        <div>
-                          <dt>Фото</dt>
-                          <dd>
-                            <ul className={styles.photos}>
-                              {workspace.photos.map((photo) => (
-                                <li key={photo.id}>
-                                  <img src={photo.url} alt="" />
-                                </li>
-                              ))}
-                            </ul>
-                          </dd>
-                        </div>
-                      )}
-                    </dl>
-                  )}
-                </li>
+                <WorkspaceRow
+                  key={itemKey}
+                  request={request}
+                  workspace={workspace}
+                  isExpanded={expandedKey === itemKey}
+                  isDeciding={
+                    rejectMutation.isPending || approveMutation.isPending
+                  }
+                  rejectMutation={rejectMutation}
+                  approveMutation={approveMutation}
+                  onToggle={() =>
+                    setExpandedKey((current) =>
+                      current === itemKey ? null : itemKey
+                    )
+                  }
+                />
               );
             })
           )}

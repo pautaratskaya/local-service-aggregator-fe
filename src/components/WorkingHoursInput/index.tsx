@@ -1,8 +1,9 @@
+import { WEEKDAY_LABELS } from '../../types/landlord';
 import styles from './WorkingHoursInput.module.scss';
 
 // TODO: format TBC
 // TODO: handle cases with working hours after 00:00; lunch brakes; different working hours for different days of the week;
-export const WORKING_DAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+export const WORKING_DAYS = WEEKDAY_LABELS;
 export const DEFAULT_WORKING_DAYS = WORKING_DAYS.slice(0, 5);
 
 type WorkingHoursInputProps = {

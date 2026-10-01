@@ -17,6 +17,28 @@ export const MIN_RENTAL_DURATIONS = {
 export type MinRentalDurationMinutes =
   (typeof MIN_RENTAL_DURATIONS)[keyof typeof MIN_RENTAL_DURATIONS];
 
+export const WEEKDAYS = {
+  MONDAY: 'Пн',
+  TUESDAY: 'Вт',
+  WEDNESDAY: 'Ср',
+  THURSDAY: 'Чт',
+  FRIDAY: 'Пт',
+  SATURDAY: 'Сб',
+  SUNDAY: 'Вс',
+} as const;
+
+export type Weekday = keyof typeof WEEKDAYS;
+
+export const WEEKDAY_LABELS = Object.values(WEEKDAYS);
+
+const WEEKDAY_API_BY_LABEL = Object.fromEntries(
+  Object.entries(WEEKDAYS).map(([apiDay, label]) => [label, apiDay])
+) as Record<(typeof WEEKDAYS)[Weekday], Weekday>;
+
+export function toWeekdayApiValue(label: string): Weekday | string {
+  return WEEKDAY_API_BY_LABEL[label as (typeof WEEKDAYS)[Weekday]] ?? label;
+}
+
 export interface LandlordPhotoMeta {
   name: string;
   size: number;
