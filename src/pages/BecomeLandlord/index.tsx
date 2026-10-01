@@ -25,6 +25,7 @@ import CheckboxInput from '../../components/CheckboxInput';
 import styles from './BecomeLandlord.module.scss';
 import { queryClient } from '../../providers/QueryProvider';
 
+// TODO: request from backend
 const PLACE_TYPE_OPTIONS = [
   { value: 'Парикмахерское кресло', label: 'Парикмахерское кресло' },
   { value: 'Кабинет для маникюра', label: 'Кабинет для маникюра' },

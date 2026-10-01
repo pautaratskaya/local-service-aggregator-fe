@@ -1,4 +1,12 @@
-import type { LandlordApplicationStatus } from './landlord';
+export const ROLE_APPLICATION_STATUSES = {
+  NO: 'NO',
+  WAITING_APPROVAL: 'WAITING_APPROVAL',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+} as const;
+
+export type RoleApplicationStatus =
+  (typeof ROLE_APPLICATION_STATUSES)[keyof typeof ROLE_APPLICATION_STATUSES];
 
 export interface User {
   id: number;
@@ -7,7 +15,8 @@ export interface User {
   lastName: string;
   roles: UserRole[];
   createdAt: string;
-  landlordRoleStatus: LandlordApplicationStatus;
+  landlordRoleStatus: RoleApplicationStatus;
+  masterRoleStatus: RoleApplicationStatus;
 }
 
 export const USER_ROLES = {

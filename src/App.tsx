@@ -11,10 +11,11 @@ import {
 import Home from './pages/Home';
 import Login from './pages/Login';
 import BecomeLandlord from './pages/BecomeLandlord';
+import BecomeMaster from './pages/BecomeMaster';
 import Admin from './pages/Admin';
 import AdminApplications from './pages/Admin/Applications';
 import Header from './components/Header';
-import { USER_ROLES } from './types/user';
+import { ROLE_APPLICATION_STATUSES, USER_ROLES } from './types/user';
 import { ToastProvider } from './components/Toast';
 import { QueryProvider } from './providers/QueryProvider';
 import PageLoader from './components/PageLoader';
@@ -42,14 +43,34 @@ function BecomeLandlordRoute() {
   const canAccess =
     !!user &&
     !user.roles.includes(USER_ROLES.LANDLORD) &&
-    (user.roles.includes(USER_ROLES.CUSTOMER) ||
-      user.roles.includes(USER_ROLES.MASTER));
+    (user.landlordRoleStatus === ROLE_APPLICATION_STATUSES.NO ||
+      user.landlordRoleStatus === ROLE_APPLICATION_STATUSES.REJECTED);
 
   if (!canAccess) {
     return <Navigate to="/" replace />;
   }
 
   return <BecomeLandlord />;
+}
+
+function BecomeMasterRoute() {
+  const { data: user, isLoading: isUserLoading } = useCurrentUser();
+
+  if (isUserLoading) {
+    return null;
+  }
+
+  const canAccess =
+    !!user &&
+    !user.roles.includes(USER_ROLES.MASTER) &&
+    (user.masterRoleStatus === ROLE_APPLICATION_STATUSES.NO ||
+      user.masterRoleStatus === ROLE_APPLICATION_STATUSES.REJECTED);
+
+  if (!canAccess) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <BecomeMaster />;
 }
 
 function AdminRoute() {
@@ -163,6 +184,7 @@ function AppRoutes() {
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Home />} />
               <Route path="/become-landlord" element={<Home />} />
+              <Route path="/become-master" element={<Home />} />
               <Route path="/admin" element={<AdminRoute />}>
                 <Route index element={<Admin />} />
                 <Route path="applications" element={<AdminApplications />} />
@@ -177,10 +199,12 @@ function AppRoutes() {
       ) : (
         (background ||
           location.pathname === '/login' ||
-          location.pathname === '/become-landlord') && (
+          location.pathname === '/become-landlord' ||
+          location.pathname === '/become-master') && (
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/become-landlord" element={<BecomeLandlordRoute />} />
+            <Route path="/become-master" element={<BecomeMasterRoute />} />
           </Routes>
         )
       )}

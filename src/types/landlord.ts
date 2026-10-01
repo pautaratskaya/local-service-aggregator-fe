@@ -1,13 +1,3 @@
-export const LANDLORD_APPLICATION_STATUSES = {
-  NO: 'NO',
-  WAITING_APPROVAL: 'WAITING_APPROVAL',
-  APPROVED: 'APPROVED',
-  REJECTED: 'REJECTED',
-} as const;
-
-export type LandlordApplicationStatus =
-  (typeof LANDLORD_APPLICATION_STATUSES)[keyof typeof LANDLORD_APPLICATION_STATUSES];
-
 export const MIN_RENTAL_DURATIONS = {
   MINUTES_30: 30,
   MINUTES_60: 60,

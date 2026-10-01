@@ -2,19 +2,31 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './Home.module.scss';
 import Button from '../../components/Button';
 import { useAuthStore } from '../../stores/authStore';
-import { USER_ROLES } from '../../types/user';
-import { LANDLORD_APPLICATION_STATUSES } from '../../types/landlord';
+import { ROLE_APPLICATION_STATUSES, USER_ROLES } from '../../types/user';
 import { useCurrentUser } from '../../hooks/useCurrentUser';
 
 function getLandlordStatusText(status: string): string {
-  if (status === LANDLORD_APPLICATION_STATUSES.WAITING_APPROVAL) {
+  if (status === ROLE_APPLICATION_STATUSES.WAITING_APPROVAL) {
     return 'Ваша заявка на создание помещения принята и находится в статусе На рассмотрении';
   }
-  if (status === LANDLORD_APPLICATION_STATUSES.APPROVED) {
+  if (status === ROLE_APPLICATION_STATUSES.APPROVED) {
     return 'Ваша заявка арендодателя одобрена';
   }
-  if (status === LANDLORD_APPLICATION_STATUSES.REJECTED) {
+  if (status === ROLE_APPLICATION_STATUSES.REJECTED) {
     return 'Ваша заявка арендодателя отклонена';
+  }
+  return '';
+}
+
+function getMasterStatusText(status: string): string {
+  if (status === ROLE_APPLICATION_STATUSES.WAITING_APPROVAL) {
+    return 'Ваша заявка мастера находится в статусе На рассмотрении';
+  }
+  if (status === ROLE_APPLICATION_STATUSES.APPROVED) {
+    return 'Ваша заявка мастера одобрена';
+  }
+  if (status === ROLE_APPLICATION_STATUSES.REJECTED) {
+    return 'Ваша заявка мастера отклонена';
   }
   return '';
 }
@@ -27,8 +39,12 @@ function Home() {
   const isLoggedIn = !!user;
 
   const landlordRoleStatus = user?.landlordRoleStatus;
+  const masterRoleStatus = user?.masterRoleStatus;
   const landlordStatusText = landlordRoleStatus
     ? getLandlordStatusText(landlordRoleStatus)
+    : '';
+  const masterStatusText = masterRoleStatus
+    ? getMasterStatusText(masterRoleStatus)
     : '';
 
   const onLoginClick = () => {
@@ -45,8 +61,7 @@ function Home() {
   };
 
   const onBecomeMasterClick = () => {
-    // TODO: Implement become master logic
-    console.log('===> become master');
+    navigate('/become-master', { state: { background: location } });
   };
 
   return (
@@ -55,23 +70,29 @@ function Home() {
         {isLoggedIn ? (
           <>
             <h1>Привет, {user.firstName}!</h1>
-            {landlordStatusText !== LANDLORD_APPLICATION_STATUSES.NO && (
+            {landlordStatusText !== ROLE_APPLICATION_STATUSES.NO && (
               <p className={styles.landlordStatus}>{landlordStatusText}</p>
+            )}
+            {masterStatusText !== ROLE_APPLICATION_STATUSES.NO && (
+              <p className={styles.landlordStatus}>{masterStatusText}</p>
             )}
             <div className={styles.actions}>
               {!user.roles.includes(USER_ROLES.LANDLORD) &&
-                (landlordRoleStatus === LANDLORD_APPLICATION_STATUSES.NO ||
+                (landlordRoleStatus === ROLE_APPLICATION_STATUSES.NO ||
                   landlordRoleStatus ===
-                    LANDLORD_APPLICATION_STATUSES.REJECTED) && (
+                    ROLE_APPLICATION_STATUSES.REJECTED) && (
                   <Button onClick={onBecomeLandlordClick} cta>
                     Стать арендодателем
                   </Button>
                 )}
-              {!user.roles.includes(USER_ROLES.MASTER) && (
-                <Button onClick={onBecomeMasterClick} disabled cta>
-                  Стать мастером
-                </Button>
-              )}
+              {!user.roles.includes(USER_ROLES.MASTER) &&
+                (masterRoleStatus === ROLE_APPLICATION_STATUSES.NO ||
+                  masterRoleStatus ===
+                    ROLE_APPLICATION_STATUSES.REJECTED) && (
+                  <Button onClick={onBecomeMasterClick} cta>
+                    Стать мастером
+                  </Button>
+                )}
               <Button onClick={onLogoutClick} cta>
                 Выйти
               </Button>

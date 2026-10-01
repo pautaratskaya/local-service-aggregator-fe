@@ -9,6 +9,7 @@ function Admin() {
     <div className={styles.admin}>
       <h1>Админка</h1>
       <Button onClick={() => navigate('/admin/applications')} cta>
+        {/* TODO: add count */}
         Просмотреть заявки
       </Button>
     </div>

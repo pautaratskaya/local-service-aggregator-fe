@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '../config';
-import type { LandlordApplicationStatus } from '../../types/landlord';
+import type { RoleApplicationStatus } from '../../types/user';
 
 export interface LandlordWorkspacePhoto {
   id: number;
@@ -36,7 +36,7 @@ export interface LandlordResponse {
 
 export interface ListLandlordsRequest {
   token: string;
-  roleRequestStatus: LandlordApplicationStatus;
+  roleRequestStatus: RoleApplicationStatus;
 }
 
 export async function listLandlords({

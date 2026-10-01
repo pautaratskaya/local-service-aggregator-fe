@@ -5,7 +5,7 @@ import FetchErrorNotice from '../../components/FetchErrorNotice';
 import PageLoader from '../../components/PageLoader';
 import { useToast } from '../../components/Toast/toastContext';
 import { useAuthStore } from '../../stores/authStore';
-import { LANDLORD_APPLICATION_STATUSES } from '../../types/landlord';
+import { ROLE_APPLICATION_STATUSES } from '../../types/user';
 import WorkspaceRow from './WorkspaceRow';
 import styles from './Admin.module.scss';
 
@@ -55,7 +55,7 @@ function AdminApplications() {
   const { data, isLoading, isError, error, refetch, isFetching } = useQuery({
     queryKey: [
       'admin-landlords',
-      LANDLORD_APPLICATION_STATUSES.WAITING_APPROVAL,
+      ROLE_APPLICATION_STATUSES.WAITING_APPROVAL,
     ],
     queryFn: () => {
       if (!token) {
@@ -64,7 +64,7 @@ function AdminApplications() {
 
       return adminService.listLandlords({
         token,
-        roleRequestStatus: LANDLORD_APPLICATION_STATUSES.WAITING_APPROVAL,
+        roleRequestStatus: ROLE_APPLICATION_STATUSES.WAITING_APPROVAL,
       });
     },
     enabled: !!token,
