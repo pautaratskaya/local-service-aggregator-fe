@@ -53,6 +53,29 @@ export default defineConfig({
           });
         },
       },
+      '/workplace-photos': {
+        target: 'https://beautibaza.duckdns.org',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path,
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            proxyReq.removeHeader('origin');
+            proxyReq.removeHeader('referer');
+            console.log('Proxying request to:', proxyReq.path);
+          });
+          proxy.on('proxyRes', (proxyRes) => {
+            console.log(
+              'Proxy response:',
+              proxyRes.statusCode,
+              proxyRes.statusMessage
+            );
+          });
+          proxy.on('error', (err) => {
+            console.log('Proxy error:', err);
+          });
+        },
+      },
       '/landlord': {
         target: 'https://beautibaza.duckdns.org',
         changeOrigin: true,

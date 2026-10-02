@@ -27,28 +27,6 @@ export function formatMinRent(minutes: number) {
   return MIN_RENT_LABELS[minutes] ?? `${minutes} мин`;
 }
 
-function parseCreatedAt(value: string) {
-  const date = new Date(value);
-
-  return Number.isNaN(date.getTime()) ? null : date;
-}
-
-export function formatCreatedDate(value: string) {
-  const date = parseCreatedAt(value);
-
-  return date ? date.toLocaleDateString('ru-RU') : value;
-}
-
-export function formatCreatedAt(value: string) {
-  const date = parseCreatedAt(value);
-
-  return date ? date.toLocaleString('ru-RU') : value;
-}
-
-export function formatOptional(value: string | null) {
-  return value && value.trim() ? value : '—';
-}
-
 export function formatWorkspaceStatus(status: string) {
   return WORKSPACE_STATUS_LABELS[status] ?? status;
 }

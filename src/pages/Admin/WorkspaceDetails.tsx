@@ -2,10 +2,9 @@ import type {
   LandlordResponse,
   LandlordWorkspaceSummary,
 } from '../../api/admin/listLandlords';
+import { formatDateTime, formatOptional } from '../../helpers';
 import {
-  formatCreatedAt,
   formatMinRent,
-  formatOptional,
   formatTime,
   formatWorkingDays,
   formatWorkspaceStatus,
@@ -84,7 +83,7 @@ function WorkspaceDetails({ request, workspace }: WorkspaceDetailsProps) {
       </div>
       <div>
         <dt>Создано</dt>
-        <dd>{formatCreatedAt(workspace.createdAt)}</dd>
+        <dd>{formatDateTime(workspace.createdAt)}</dd>
       </div>
       {workspace.photos.length > 0 && (
         <div>

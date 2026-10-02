@@ -1,23 +1,34 @@
-import { useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useState } from 'react';
 import Button from '../../components/Button';
+import PageLoader from '../../components/PageLoader';
 import Modal from '../../components/Modal';
 import TextInput from '../../components/TextInput';
 import TextareaInput from '../../components/TextareaInput';
 import SelectInput from '../../components/SelectInput';
 import FileInput from '../../components/FileInput';
 import { LANDLORD_PHOTO_CONFIG } from '../../api/landlord/submitApplication';
+import { useCurrentUser } from '../../hooks/useCurrentUser';
 import {
   MIN_RENTAL_DURATIONS,
   toWeekdayApiValue,
   type MinRentalDurationMinutes,
   type LandlordLegalInfo,
 } from '../../types/landlord';
+import { ROLE_APPLICATION_STATUSES } from '../../types/user';
 import WorkingHoursInput, {
   DEFAULT_WORKING_DAYS,
 } from '../../components/WorkingHoursInput';
 import LegalInfoInput from '../../components/LegalInfoInput';
 import CheckboxInput from '../../components/CheckboxInput';
+import {
+  pickRejectedWorkspace,
+  useLandlordWorkspaces,
+} from './hooks/useLandlordWorkspaces';
 import { useSubmitLandlordApplication } from './hooks/useSubmitLandlordApplication';
+import {
+  applyRejectedWorkspace,
+  workspacePhotoToFile,
+} from './rejectedWorkspace';
 import styles from './BecomeLandlord.module.scss';
 
 // TODO: request from backend
@@ -36,6 +47,12 @@ const MIN_RENTAL_OPTIONS = [
 type Errors = Partial<Record<string, string>>;
 
 function BecomeLandlord() {
+  const { data: user } = useCurrentUser();
+  const isReapply =
+    user?.landlordRoleStatus === ROLE_APPLICATION_STATUSES.REJECTED;
+  const workspacesQuery = useLandlordWorkspaces(isReapply);
+  const rejectedWorkspace = pickRejectedWorkspace(workspacesQuery.data);
+  const rejectedWorkspaceId = rejectedWorkspace?.id;
   const [placeName, setPlaceName] = useState('');
   const [city, setCity] = useState('');
   const [address, setAddress] = useState('');
@@ -49,11 +66,70 @@ function BecomeLandlord() {
     useState<MinRentalDurationMinutes>(MIN_RENTAL_DURATIONS.MINUTES_60);
   const [pricePerHour, setPricePerHour] = useState('');
   const [photos, setPhotos] = useState<File[]>([]);
+  const [photosLoading, setPhotosLoading] = useState(false);
   const [companyName, setCompanyName] = useState('');
   const [registrationNumber, setRegistrationNumber] = useState('');
   const [bankDetails, setBankDetails] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
+
+  useLayoutEffect(() => {
+    if (!rejectedWorkspace) {
+      return;
+    }
+
+    applyRejectedWorkspace(rejectedWorkspace, {
+      setPlaceName,
+      setCity,
+      setAddress,
+      setPlaceType,
+      setDescription,
+      setWorkFrom,
+      setWorkTo,
+      setWorkingDays,
+      setMinRentalDurationMinutes,
+      setPricePerHour,
+      setCompanyName,
+      setRegistrationNumber,
+      setBankDetails,
+    });
+
+    let cancelled = false;
+    const photosToLoad = [...rejectedWorkspace.photos].sort(
+      (a, b) => a.order - b.order,
+    );
+
+    if (photosToLoad.length === 0) {
+      return;
+    }
+
+    setPhotosLoading(true);
+    void Promise.all(photosToLoad.map((photo) => workspacePhotoToFile(photo)))
+      .then((files) => {
+        if (!cancelled) {
+          setPhotos(files);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setErrors((current) => ({
+            ...current,
+            photos: 'Не удалось подгрузить фотографии. Добавьте их заново.',
+          }));
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setPhotosLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+    // Refetching the same workspace must not cancel the photo download.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rejectedWorkspaceId]);
 
   const legalInfo: LandlordLegalInfo | null = useMemo(() => {
     if (!companyName && !registrationNumber && !bankDetails) {
@@ -164,13 +240,29 @@ function BecomeLandlord() {
     });
   };
 
+  const showLoader =
+    isReapply &&
+    !workspacesQuery.isError &&
+    (workspacesQuery.isLoading || photosLoading);
+
   return (
-    <Modal title="Стать арендодателем">
+    <Modal title={isReapply ? 'Исправить заявку' : 'Стать арендодателем'}>
       <div className={styles.becomeLandlord}>
+        {showLoader ? (
+          <PageLoader />
+        ) : (
+          <>
         <div className={styles.content}>
           <p className={styles.description}>
-            Заполните обязательные поля для отправки заявки на модерацию
+            {isReapply
+              ? 'Проверьте данные отклонённой заявки и отправьте её снова.'
+              : 'Заполните обязательные поля для отправки заявки на модерацию'}
           </p>
+          {isReapply && workspacesQuery.isError && (
+            <p className={styles.error}>
+              Не удалось загрузить предыдущую заявку. Заполните форму заново.
+            </p>
+          )}
           <TextInput
             label="Название помещения/рабочего места"
             required
@@ -296,12 +388,24 @@ function BecomeLandlord() {
         </div>
 
         <footer>
-          <Button onClick={onSubmit} cta disabled={submitMutation.isPending}>
+          <Button
+            onClick={onSubmit}
+            cta
+            disabled={
+              submitMutation.isPending ||
+              photosLoading ||
+              (isReapply && workspacesQuery.isLoading)
+            }
+          >
             {submitMutation.isPending
               ? 'Отправляем...'
-              : 'Отправить на модерацию'}
+              : isReapply
+                ? 'Отправить снова'
+                : 'Отправить на модерацию'}
           </Button>
         </footer>
+          </>
+        )}
       </div>
     </Modal>
   );

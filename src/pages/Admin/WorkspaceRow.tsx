@@ -5,7 +5,7 @@ import type {
 } from '../../api/admin/listLandlords';
 import Button from '../../components/Button';
 import TextareaInput from '../../components/TextareaInput';
-import { formatCreatedDate } from './formatApplication';
+import { formatDate } from '../../helpers';
 import type { useApproveLandlord } from './hooks/useApproveLandlord';
 import type { useRejectLandlord } from './hooks/useRejectLandlord';
 import WorkspaceDetails from './WorkspaceDetails';
@@ -50,7 +50,7 @@ function WorkspaceRow({
       >
         <span className={styles.summary}>
           {request.realName} — {workspace.name} —{' '}
-          {formatCreatedDate(workspace.createdAt)}
+          {formatDate(workspace.createdAt)}
         </span>
         <div
           className={styles.actions}
