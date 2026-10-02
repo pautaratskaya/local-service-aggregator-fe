@@ -1,3 +1,4 @@
+import { flushSync } from 'react-dom';
 import styles from './UserRoles.module.scss';
 import { useAuthStore } from '../../stores/authStore';
 import { getUserRoleLabel, USER_ROLES, type UserRole } from '../../types/user';
@@ -17,6 +18,25 @@ function UserRoles({ roles }: UserRolesProps) {
   const otherRoles = roles.filter(
     (role) => role !== USER_ROLES.ADMIN && role !== currentRole,
   );
+  const canApplyForMoreRoles =
+    !roles.includes(USER_ROLES.MASTER) || !roles.includes(USER_ROLES.LANDLORD);
+
+  function selectRole(role: UserRole) {
+    const reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+
+    if (reduceMotion || !document.startViewTransition) {
+      setSelectedRole(role);
+      return;
+    }
+
+    document.startViewTransition(() => {
+      flushSync(() => {
+        setSelectedRole(role);
+      });
+    });
+  }
 
   return (
     <div className={styles.rolesSection} aria-label="Роли пользователя">
@@ -26,7 +46,12 @@ function UserRoles({ roles }: UserRolesProps) {
           <span className={styles.adminRole}>{getUserRoleLabel(USER_ROLES.ADMIN)}</span>
         )}
         {currentRole && (
-          <span className={styles.currentRole}>{getUserRoleLabel(currentRole)}</span>
+          <span
+            className={styles.currentRole}
+            style={{ viewTransitionName: `role-${currentRole}` }}
+          >
+            {getUserRoleLabel(currentRole)}
+          </span>
         )}
       </div>
       {otherRoles.length > 0 && (
@@ -37,12 +62,18 @@ function UserRoles({ roles }: UserRolesProps) {
               key={role}
               type="button"
               className={styles.roleButton}
-              onClick={() => setSelectedRole(role)}
+              style={{ viewTransitionName: `role-${role}` }}
+              onClick={() => selectRole(role)}
             >
               {getUserRoleLabel(role)}
             </button>
           ))}
         </div>
+      )}
+      {canApplyForMoreRoles && (
+        <p className={styles.hint}>
+          Подать заявку на другие роли можно через профиль в меню.
+        </p>
       )}
     </div>
   );

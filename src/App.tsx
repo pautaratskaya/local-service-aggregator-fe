@@ -14,6 +14,7 @@ import BecomeLandlord from './pages/BecomeLandlord';
 import BecomeMaster from './pages/BecomeMaster';
 import Admin from './pages/Admin';
 import AdminApplications from './pages/Admin/Applications';
+import Profile from './pages/Profile';
 import Header from './components/Header';
 import { ROLE_APPLICATION_STATUSES, USER_ROLES } from './types/user';
 import { ToastProvider } from './components/Toast';
@@ -182,6 +183,7 @@ function AppRoutes() {
           <div className="page">
             <Routes location={background || location}>
               <Route path="/" element={<Home />} />
+              <Route path="/profile" element={<Profile />} />
               <Route path="/login" element={<Home />} />
               <Route path="/become-landlord" element={<Home />} />
               <Route path="/become-master" element={<Home />} />

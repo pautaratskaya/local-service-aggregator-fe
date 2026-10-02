@@ -1,0 +1,14 @@
+---
+description: Do not open or verify the app on localhost
+alwaysApply: true
+---
+
+# No localhost checks
+
+These rules apply to every prompt in this workspace.
+
+- Do not start the dev server.
+- Do not open the app in a browser.
+- Do not navigate to localhost or check UI behavior there.
+
+Skip browser verification for this project unless the user explicitly asks to open or check localhost.

@@ -63,9 +63,13 @@ function HeaderMenu({ user }: HeaderMenuProps) {
             </button>
             <ul className={styles.menuList}>
               <li>
-                <button type="button" className={styles.menuItem}>
+                <Link
+                  className={styles.menuItem}
+                  to="/profile"
+                  onClick={() => setIsMenuOpen(false)}
+                >
                   Профиль
-                </button>
+                </Link>
               </li>
               {isAdmin && (
                 <li>

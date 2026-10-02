@@ -53,4 +53,14 @@
       background: rgba($text-color, 0.1);
     }
   }
+
+  .hint {
+    margin: 0;
+    text-align: center;
+  }
+}
+
+:global(::view-transition-group(*)) {
+  animation-duration: 0.28s;
+  animation-timing-function: ease;
 }
