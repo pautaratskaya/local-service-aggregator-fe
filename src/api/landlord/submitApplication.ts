@@ -17,7 +17,9 @@ export interface SubmitLandlordApplicationRequest {
   payload: SubmitLandlordApplicationPayload;
 }
 
-function validatePayload(payload: SubmitLandlordApplicationPayload): void {
+export function validateWorkspacePhotos(
+  payload: SubmitLandlordApplicationPayload
+): void {
   if (payload.photos.length < LANDLORD_PHOTO_CONFIG.MIN_COUNT) {
     throw new LandlordError(
       'Добавьте минимум 3 фотографии',
@@ -59,12 +61,9 @@ function validatePayload(payload: SubmitLandlordApplicationPayload): void {
   }
 }
 
-export async function submitApplication({
-  token,
-  payload,
-}: SubmitLandlordApplicationRequest): Promise<LandlordApplication> {
-  validatePayload(payload);
-
+export function buildWorkspaceFormData(
+  payload: SubmitLandlordApplicationPayload
+) {
   const formData = new FormData();
 
   formData.append('name', payload.placeName);
@@ -106,12 +105,21 @@ export async function submitApplication({
     formData.append('photos', photo);
   });
 
+  return formData;
+}
+
+export async function submitApplication({
+  token,
+  payload,
+}: SubmitLandlordApplicationRequest): Promise<LandlordApplication> {
+  validateWorkspacePhotos(payload);
+
   const response = await fetch(`${API_BASE_URL}/landlord/request-landlord`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
     },
-    body: formData,
+    body: buildWorkspaceFormData(payload),
   });
 
   if (!response.ok) {

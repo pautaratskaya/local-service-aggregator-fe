@@ -2,7 +2,7 @@ import { ROLE_APPLICATION_STATUSES } from '../../types/user';
 
 export function getLandlordStatusText(status: string): string {
   if (status === ROLE_APPLICATION_STATUSES.WAITING_APPROVAL) {
-    return 'Ваша заявка на создание помещения принята и находится в статусе На рассмотрении';
+    return 'Ваша заявка на создание рабочего места принята и находится в статусе На рассмотрении';
   }
   if (status === ROLE_APPLICATION_STATUSES.APPROVED) {
     return 'Ваша заявка арендодателя одобрена';

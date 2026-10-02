@@ -82,7 +82,7 @@ function HeaderMenu({ user }: HeaderMenuProps) {
                     to="/workspaces"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Мои помещения
+                    Мои рабочие места
                   </Link>
                 </li>
               )}

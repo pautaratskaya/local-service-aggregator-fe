@@ -24,7 +24,7 @@ function WorkspaceDetails({ request, workspace }: WorkspaceDetailsProps) {
         <dd>{request.realName}</dd>
       </div>
       <div>
-        <dt>Название помещения</dt>
+        <dt>Название рабочего места</dt>
         <dd>{workspace.name}</dd>
       </div>
       <div>
@@ -40,7 +40,7 @@ function WorkspaceDetails({ request, workspace }: WorkspaceDetailsProps) {
         <dd>{workspace.address}</dd>
       </div>
       <div>
-        <dt>Тип помещения</dt>
+        <dt>Тип рабочего места</dt>
         <dd>{workspace.kind}</dd>
       </div>
       <div>

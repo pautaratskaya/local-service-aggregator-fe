@@ -16,6 +16,7 @@ import Admin from './pages/Admin';
 import AdminApplications from './pages/Admin/Applications';
 import Profile from './pages/Profile';
 import Workspaces from './pages/Workspaces';
+import AddWorkspace from './pages/Workspaces/AddWorkspace';
 import Header from './components/Header';
 import { ROLE_APPLICATION_STATUSES, USER_ROLES } from './types/user';
 import { ToastProvider } from './components/Toast';
@@ -210,6 +211,7 @@ function AppRoutes() {
               <Route path="/" element={<Home />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/workspaces" element={<WorkspacesRoute />} />
+              <Route path="/add-workspace" element={<WorkspacesRoute />} />
               <Route path="/login" element={<Home />} />
               <Route path="/become-landlord" element={<Home />} />
               <Route path="/become-master" element={<Home />} />
@@ -228,11 +230,13 @@ function AppRoutes() {
         (background ||
           location.pathname === '/login' ||
           location.pathname === '/become-landlord' ||
-          location.pathname === '/become-master') && (
+          location.pathname === '/become-master' ||
+          location.pathname === '/add-workspace') && (
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/become-landlord" element={<BecomeLandlordRoute />} />
             <Route path="/become-master" element={<BecomeMasterRoute />} />
+            <Route path="/add-workspace" element={<AddWorkspace />} />
           </Routes>
         )
       )}

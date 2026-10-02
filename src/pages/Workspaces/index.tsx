@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import Button from '../../components/Button';
 import FetchErrorNotice from '../../components/FetchErrorNotice';
 import PageLoader from '../../components/PageLoader';
 import { useLandlordWorkspaces } from '../../hooks/useLandlordWorkspaces';
@@ -6,6 +8,8 @@ import WorkspaceCard from './WorkspaceCard';
 import styles from './Workspaces.module.scss';
 
 function Workspaces() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const { data, isLoading, isError, error, refetch, isFetching } =
     useLandlordWorkspaces(true);
@@ -20,7 +24,7 @@ function Workspaces() {
         message={
           error instanceof Error
             ? error.message
-            : 'Не удалось загрузить помещения'
+            : 'Не удалось загрузить рабочие места'
         }
         actionLabel="Повторить"
         onAction={() => {
@@ -32,7 +36,19 @@ function Workspaces() {
 
   return (
     <div className={styles.workspaces}>
-      <h1>Мои помещения</h1>
+      <div className={styles.header}>
+        <h1>Мои рабочие места</h1>
+        <Button
+          type="button"
+          className={styles.addButton}
+          cta
+          onClick={() =>
+            navigate('/add-workspace', { state: { background: location } })
+          }
+        >
+          Добавить рабочее место
+        </Button>
+      </div>
       {data && data.length > 0 ? (
         <ul className={styles.list}>
           {data.map((workspace) => (
@@ -49,7 +65,7 @@ function Workspaces() {
           ))}
         </ul>
       ) : (
-        <p className={styles.empty}>Помещений пока нет</p>
+        <p className={styles.empty}>Рабочих мест пока нет</p>
       )}
     </div>
   );

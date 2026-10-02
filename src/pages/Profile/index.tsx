@@ -7,9 +7,7 @@ import {
   getUserRoleLabel,
   type UserRole,
 } from '../../types/user';
-import ProfileNotifications, {
-  isUnreadDecision,
-} from './ProfileNotifications';
+import ProfileNotifications, { isUnreadDecision } from './ProfileNotifications';
 import styles from './Profile.module.scss';
 import { getLandlordStatusText, getMasterStatusText } from './statusText';
 
@@ -76,6 +74,18 @@ function Profile() {
             onApply={() =>
               navigate('/become-landlord', { state: { background: location } })
             }
+            secondaryLabel={
+              !landlordUnread &&
+              user.landlordRoleStatus === ROLE_APPLICATION_STATUSES.APPROVED
+                ? 'Перейти к моим рабочим местам'
+                : undefined
+            }
+            onSecondary={
+              !landlordUnread &&
+              user.landlordRoleStatus === ROLE_APPLICATION_STATUSES.APPROVED
+                ? () => navigate('/workspaces')
+                : undefined
+            }
           />
           <ApplicationSection
             title="Мастер"
@@ -121,6 +131,8 @@ function ApplicationSection({
   canApply,
   applyLabel,
   onApply,
+  secondaryLabel,
+  onSecondary,
 }: {
   title: string;
   statusText: string;
@@ -128,6 +140,8 @@ function ApplicationSection({
   canApply: boolean;
   applyLabel: string;
   onApply: () => void;
+  secondaryLabel?: string;
+  onSecondary?: () => void;
 }) {
   return (
     <section className={styles.application}>
@@ -137,6 +151,11 @@ function ApplicationSection({
           {statusText}
           {rejectReason ? `. Причина: ${rejectReason}` : ''}
         </p>
+      )}
+      {secondaryLabel && onSecondary && (
+        <Button type="button" onClick={onSecondary} cta>
+          {secondaryLabel}
+        </Button>
       )}
       {canApply && (
         <Button type="button" onClick={onApply} cta>

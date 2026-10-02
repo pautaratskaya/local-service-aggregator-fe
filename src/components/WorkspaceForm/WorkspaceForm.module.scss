@@ -1,6 +1,6 @@
 @use '../../variables' as *;
 
-.becomeLandlord {
+.form {
   height: 100%;
   min-height: 100%;
   display: flex;
@@ -30,11 +30,6 @@
       margin: 8px 0 16px;
     }
 
-    .meta {
-      margin: 0;
-      color: $info-text-color;
-      font-size: 12px;
-    }
     .error {
       margin: 0;
       font-size: 12px;
@@ -42,9 +37,11 @@
     }
 
     .link {
+      display: block;
       margin-top: 10px;
       color: $link-color;
       font-size: 13px;
+      text-align: center;
       text-decoration: none;
     }
   }

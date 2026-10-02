@@ -1,4 +1,5 @@
 import type { LandlordWorkspaceSummary } from '../../api/admin/listLandlords';
+import { TriangleDownIcon } from '../../icons';
 import { formatDateTime, formatOptional } from '../../helpers';
 import {
   formatMinRent,
@@ -34,11 +35,17 @@ function WorkspaceCard({ workspace, isExpanded, onToggle }: WorkspaceCardProps) 
         <span className={styles.summary}>
           {workspace.name} ({workspace.address})
         </span>
+        <span
+          className={`${styles.chevron} ${isExpanded ? styles.expanded : ''}`}
+          aria-hidden
+        >
+          <TriangleDownIcon />
+        </span>
       </div>
       {isExpanded && (
         <dl className={styles.details}>
           <div>
-            <dt>Название помещения</dt>
+            <dt>Название рабочего места</dt>
             <dd>{workspace.name}</dd>
           </div>
           <div>
@@ -50,7 +57,7 @@ function WorkspaceCard({ workspace, isExpanded, onToggle }: WorkspaceCardProps) 
             <dd>{workspace.address}</dd>
           </div>
           <div>
-            <dt>Тип помещения</dt>
+            <dt>Тип рабочего места</dt>
             <dd>{workspace.kind}</dd>
           </div>
           <div>
