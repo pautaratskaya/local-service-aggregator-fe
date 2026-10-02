@@ -1,23 +1,23 @@
+import { useState } from 'react';
 import type {
   LandlordResponse,
   LandlordWorkspaceSummary,
 } from '../../api/admin/listLandlords';
 import Button from '../../components/Button';
+import TextareaInput from '../../components/TextareaInput';
 import { formatCreatedDate } from './formatApplication';
+import type { useApproveLandlord } from './hooks/useApproveLandlord';
+import type { useRejectLandlord } from './hooks/useRejectLandlord';
 import WorkspaceDetails from './WorkspaceDetails';
 import styles from './Admin.module.scss';
-
-type DecisionMutation = {
-  mutate: (userId: number) => void;
-};
 
 type WorkspaceRowProps = {
   request: LandlordResponse;
   workspace: LandlordWorkspaceSummary;
   isExpanded: boolean;
   isDeciding: boolean;
-  rejectMutation: DecisionMutation;
-  approveMutation: DecisionMutation;
+  rejectMutation: Pick<ReturnType<typeof useRejectLandlord>, 'mutate'>;
+  approveMutation: Pick<ReturnType<typeof useApproveLandlord>, 'mutate'>;
   onToggle: () => void;
 };
 
@@ -30,34 +30,88 @@ function WorkspaceRow({
   approveMutation,
   onToggle,
 }: WorkspaceRowProps) {
+  const [isRejectOpen, setIsRejectOpen] = useState(false);
+  const [rejectReason, setRejectReason] = useState('');
+
   return (
     <li>
-      <div className={styles.row}>
-        <button
-          type="button"
-          className={styles.summary}
-          aria-expanded={isExpanded}
-          onClick={onToggle}
-        >
+      <div
+        className={styles.row}
+        role="button"
+        tabIndex={0}
+        aria-expanded={isExpanded}
+        onClick={onToggle}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            onToggle();
+          }
+        }}
+      >
+        <span className={styles.summary}>
           {request.realName} — {workspace.name} —{' '}
           {formatCreatedDate(workspace.createdAt)}
-        </button>
-        <div className={styles.actions}>
-          <Button
-            type="button"
-            disabled={isDeciding}
-            onClick={() => rejectMutation.mutate(request.userId)}
-          >
-            Отклонить
-          </Button>
-          <Button
-            type="button"
-            disabled={isDeciding}
-            onClick={() => approveMutation.mutate(request.userId)}
-            cta
-          >
-            Одобрить
-          </Button>
+        </span>
+        <div
+          className={styles.actions}
+          onClick={(event) => event.stopPropagation()}
+          onKeyDown={(event) => event.stopPropagation()}
+        >
+          {!isRejectOpen && (
+            <div className={styles.actionButtons}>
+              <Button
+                type="button"
+                disabled={isDeciding}
+                onClick={() => setIsRejectOpen(true)}
+              >
+                Отклонить
+              </Button>
+              <Button
+                type="button"
+                disabled={isDeciding}
+                onClick={() => approveMutation.mutate(request.userId)}
+                cta
+              >
+                Одобрить
+              </Button>
+            </div>
+          )}
+          {isRejectOpen && (
+            <form
+              className={styles.rejectForm}
+              onSubmit={(event) => {
+                event.preventDefault();
+                const reason = rejectReason.trim();
+
+                rejectMutation.mutate({
+                  userId: request.userId,
+                  ...(reason ? { reason } : {}),
+                });
+              }}
+            >
+              <TextareaInput
+                label="Причина отклонения"
+                value={rejectReason}
+                disabled={isDeciding}
+                onChange={(event) => setRejectReason(event.target.value)}
+              />
+              <div className={styles.rejectActions}>
+                <Button
+                  type="button"
+                  disabled={isDeciding}
+                  onClick={() => {
+                    setIsRejectOpen(false);
+                    setRejectReason('');
+                  }}
+                >
+                  Отмена
+                </Button>
+                <Button type="submit" disabled={isDeciding} cta>
+                  Отклонить
+                </Button>
+              </div>
+            </form>
+          )}
         </div>
       </div>
       {isExpanded && (

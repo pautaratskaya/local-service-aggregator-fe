@@ -3,6 +3,7 @@ import { authService } from '../api/auth/authService';
 import { AuthError } from '../api/auth/types';
 import { GET_USER_ERROR_TYPES } from '../api/auth/user';
 import { useAuthStore } from '../stores/authStore';
+import { userDetailsQueryKey } from './userDetailsQueryKey';
 
 export function isMissingUserError(error: unknown): boolean {
   return (
@@ -22,7 +23,7 @@ export function useCurrentUser() {
   const token = useAuthStore((state) => state.token);
 
   return useQuery({
-    queryKey: ['user-details', userId],
+    queryKey: userDetailsQueryKey(userId),
     queryFn: () => {
       if (userId == null || !token) {
         throw new Error('User id is required');

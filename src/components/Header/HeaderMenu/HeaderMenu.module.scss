@@ -1,0 +1,112 @@
+@use '../../../variables.scss' as *;
+
+.menuButton {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border: none;
+  border-radius: 12px;
+  color: rgba($text-color, 0.45);
+  background: rgba($text-color, 0.06);
+  cursor: pointer;
+
+  &:hover {
+    color: $text-color;
+    background: rgba($text-color, 0.1);
+  }
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+
+  .backdrop {
+    position: absolute;
+    inset: 0;
+    padding: 0;
+    border: none;
+    background: rgba($text-color, 0.4);
+    cursor: pointer;
+  }
+
+  .drawer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    width: min(320px, 100%);
+    height: 100%;
+    box-sizing: border-box;
+    padding: 24px 20px;
+    background: $background-color;
+    box-shadow: -8px 0 24px rgba($text-color, 0.12);
+    animation: slideIn 0.2s ease;
+
+    .closeButton {
+      align-self: flex-end;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      margin-bottom: 16px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: rgba($text-color, 0.06);
+      cursor: pointer;
+
+      svg {
+        width: 12px;
+        height: 12px;
+      }
+
+      &:hover {
+        background: rgba($text-color, 0.1);
+      }
+    }
+
+    .menuList {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .menuItem {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px 8px;
+      border: none;
+      border-radius: 8px;
+      color: $text-color;
+      background: transparent;
+      font: inherit;
+      font-size: 16px;
+      font-weight: 600;
+      text-align: left;
+      text-decoration: none;
+      cursor: pointer;
+
+      &:hover {
+        background: rgba($text-color, 0.06);
+      }
+    }
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}

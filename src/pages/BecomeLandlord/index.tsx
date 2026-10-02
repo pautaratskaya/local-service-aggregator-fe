@@ -1,16 +1,11 @@
 import { useMemo, useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { useNavigate, useLocation } from 'react-router-dom';
 import Button from '../../components/Button';
-import { useToast } from '../../components/Toast/toastContext';
 import Modal from '../../components/Modal';
 import TextInput from '../../components/TextInput';
 import TextareaInput from '../../components/TextareaInput';
 import SelectInput from '../../components/SelectInput';
 import FileInput from '../../components/FileInput';
-import { landlordService } from '../../api/landlord/landlordService';
 import { LANDLORD_PHOTO_CONFIG } from '../../api/landlord/submitApplication';
-import { useAuthStore } from '../../stores/authStore';
 import {
   MIN_RENTAL_DURATIONS,
   toWeekdayApiValue,
@@ -22,8 +17,8 @@ import WorkingHoursInput, {
 } from '../../components/WorkingHoursInput';
 import LegalInfoInput from '../../components/LegalInfoInput';
 import CheckboxInput from '../../components/CheckboxInput';
+import { useSubmitLandlordApplication } from './hooks/useSubmitLandlordApplication';
 import styles from './BecomeLandlord.module.scss';
-import { queryClient } from '../../providers/QueryProvider';
 
 // TODO: request from backend
 const PLACE_TYPE_OPTIONS = [
@@ -41,12 +36,6 @@ const MIN_RENTAL_OPTIONS = [
 type Errors = Partial<Record<string, string>>;
 
 function BecomeLandlord() {
-  const userId = useAuthStore((state) => state.userId);
-  const token = useAuthStore((state) => state.token);
-  const navigate = useNavigate();
-  const location = useLocation();
-  const showToast = useToast();
-
   const [placeName, setPlaceName] = useState('');
   const [city, setCity] = useState('');
   const [address, setAddress] = useState('');
@@ -78,45 +67,7 @@ function BecomeLandlord() {
     };
   }, [companyName, registrationNumber, bankDetails]);
 
-  const submitMutation = useMutation({
-    mutationFn: () => {
-      if (!userId) {
-        throw new Error('Требуется авторизация');
-      }
-      if (!token) {
-        throw new Error('Не найден токен авторизации');
-      }
-
-      return landlordService.submitApplication({
-        token,
-        payload: {
-          placeName: placeName.trim(),
-          city: city.trim(),
-          address: address.trim(),
-          placeTypes: [placeType],
-          description: description.trim(),
-          workingHours: {
-            from: workFrom,
-            to: workTo,
-          },
-          workingDays: workingDays.map((day) => toWeekdayApiValue(day)),
-          minRentalDurationMinutes,
-          pricePerHour: Number(pricePerHour),
-          legalInfo,
-          photos,
-        },
-      });
-    },
-    onSuccess: async () => {
-      showToast('success', 'Заявка отправлена');
-      await queryClient.invalidateQueries({
-        queryKey: ['user-details', userId],
-      });
-
-      const background = location.state?.background;
-      navigate(background?.pathname || '/');
-    },
-  });
+  const submitMutation = useSubmitLandlordApplication();
 
   const validateForm = () => {
     const nextErrors: Errors = {};
@@ -195,7 +146,22 @@ function BecomeLandlord() {
     if (!validateForm()) {
       return;
     }
-    submitMutation.mutate();
+    submitMutation.mutate({
+      placeName: placeName.trim(),
+      city: city.trim(),
+      address: address.trim(),
+      placeTypes: [placeType],
+      description: description.trim(),
+      workingHours: {
+        from: workFrom,
+        to: workTo,
+      },
+      workingDays: workingDays.map((day) => toWeekdayApiValue(day)),
+      minRentalDurationMinutes,
+      pricePerHour: Number(pricePerHour),
+      legalInfo,
+      photos,
+    });
   };
 
   return (

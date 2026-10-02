@@ -3,11 +3,13 @@ import { API_BASE_URL } from '../config';
 export interface RejectLandlordRequest {
   token: string;
   userId: number;
+  reason?: string;
 }
 
 export async function rejectLandlord({
   token,
   userId,
+  reason,
 }: RejectLandlordRequest): Promise<void> {
   try {
     const response = await fetch(`${API_BASE_URL}/api/admin/reject-landlord`, {
@@ -16,7 +18,10 @@ export async function rejectLandlord({
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ userId }),
+      body: JSON.stringify({
+        userId,
+        ...(reason ? { reason } : {}),
+      }),
     });
 
     if (!response.ok) {

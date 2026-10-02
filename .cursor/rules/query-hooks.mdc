@@ -1,0 +1,28 @@
+---
+description: Organize TanStack Query queries and mutations as page hooks with shared query keys
+alwaysApply: true
+---
+
+# Query and mutation hooks
+
+Do not call `useQuery` or `useMutation` inside page components. Put each query and each mutation in its own hook.
+
+- Hooks used by one page live in `src/pages/<Page>/hooks/use*.ts`.
+- Hooks used by more than one page live in `src/hooks/`.
+
+## Query keys
+
+A query key is a named constant next to the hooks that share it. The query and every mutation that refreshes that data import the same constant. Do not repeat the key as an inline array.
+
+```typescript
+export const pendingLandlordsQueryKey = [
+  'admin-landlords',
+  ROLE_APPLICATION_STATUSES.WAITING_APPROVAL,
+] as const;
+
+useQuery({ queryKey: pendingLandlordsQueryKey, queryFn });
+
+queryClient.invalidateQueries({ queryKey: pendingLandlordsQueryKey });
+```
+
+Include every value that changes the response (filters, ids, status) in that constant or in a function that builds the key from those values.

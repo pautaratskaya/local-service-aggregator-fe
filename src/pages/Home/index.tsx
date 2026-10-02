@@ -1,59 +1,38 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './Home.module.scss';
 import Button from '../../components/Button';
-import { useAuthStore } from '../../stores/authStore';
+import UserRoles from '../../components/UserRoles';
 import { ROLE_APPLICATION_STATUSES, USER_ROLES } from '../../types/user';
 import { useCurrentUser } from '../../hooks/useCurrentUser';
-
-function getLandlordStatusText(status: string): string {
-  if (status === ROLE_APPLICATION_STATUSES.WAITING_APPROVAL) {
-    return 'Ваша заявка на создание помещения принята и находится в статусе На рассмотрении';
-  }
-  if (status === ROLE_APPLICATION_STATUSES.APPROVED) {
-    return 'Ваша заявка арендодателя одобрена';
-  }
-  if (status === ROLE_APPLICATION_STATUSES.REJECTED) {
-    return 'Ваша заявка арендодателя отклонена';
-  }
-  return '';
-}
-
-function getMasterStatusText(status: string): string {
-  if (status === ROLE_APPLICATION_STATUSES.WAITING_APPROVAL) {
-    return 'Ваша заявка мастера находится в статусе На рассмотрении';
-  }
-  if (status === ROLE_APPLICATION_STATUSES.APPROVED) {
-    return 'Ваша заявка мастера одобрена';
-  }
-  if (status === ROLE_APPLICATION_STATUSES.REJECTED) {
-    return 'Ваша заявка мастера отклонена';
-  }
-  return '';
-}
+import { getLandlordStatusText, getMasterStatusText } from './statusText';
 
 function Home() {
   const navigate = useNavigate();
   const location = useLocation();
-  const logout = useAuthStore((state) => state.logout);
   const { data: user } = useCurrentUser();
   const isLoggedIn = !!user;
 
   const landlordRoleStatus = user?.landlordRoleStatus;
   const masterRoleStatus = user?.masterRoleStatus;
+  const landlordApplication = user?.landlordApplication ?? null;
+  const masterApplication = user?.masterApplication ?? null;
   const landlordStatusText = landlordRoleStatus
     ? getLandlordStatusText(landlordRoleStatus)
     : '';
   const masterStatusText = masterRoleStatus
     ? getMasterStatusText(masterRoleStatus)
     : '';
+  const landlordRejectReason =
+    landlordApplication?.status === ROLE_APPLICATION_STATUSES.REJECTED
+      ? landlordApplication.rejectReason?.trim()
+      : '';
+  const masterRejectReason =
+    masterApplication?.status === ROLE_APPLICATION_STATUSES.REJECTED
+      ? masterApplication.rejectReason?.trim()
+      : '';
 
   const onLoginClick = () => {
     navigate('/login', { state: { background: location } });
-  };
-
-  const onLogoutClick = () => {
-    logout();
-    navigate('/');
   };
 
   const onBecomeLandlordClick = () => {
@@ -70,11 +49,18 @@ function Home() {
         {isLoggedIn ? (
           <>
             <h1>Привет, {user.firstName}!</h1>
+            <UserRoles roles={user.roles} />
             {landlordStatusText !== ROLE_APPLICATION_STATUSES.NO && (
-              <p className={styles.landlordStatus}>{landlordStatusText}</p>
+              <p className={styles.landlordStatus}>
+                {landlordStatusText}
+                {landlordRejectReason ? `. Причина: ${landlordRejectReason}` : ''}
+              </p>
             )}
             {masterStatusText !== ROLE_APPLICATION_STATUSES.NO && (
-              <p className={styles.landlordStatus}>{masterStatusText}</p>
+              <p className={styles.landlordStatus}>
+                {masterStatusText}
+                {masterRejectReason ? `. Причина: ${masterRejectReason}` : ''}
+              </p>
             )}
             <div className={styles.actions}>
               {!user.roles.includes(USER_ROLES.LANDLORD) &&
@@ -93,9 +79,6 @@ function Home() {
                     Стать мастером
                   </Button>
                 )}
-              <Button onClick={onLogoutClick} cta>
-                Выйти
-              </Button>
             </div>
           </>
         ) : (

@@ -1,52 +1,17 @@
 import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { masterService } from '../../api/master/masterService';
 import Button from '../../components/Button';
 import Modal from '../../components/Modal';
 import TextInput from '../../components/TextInput';
-import { useToast } from '../../components/Toast/toastContext';
-import { queryClient } from '../../providers/QueryProvider';
-import { useAuthStore } from '../../stores/authStore';
+import { useRequestMaster } from './hooks/useRequestMaster';
 import styles from './BecomeMaster.module.scss';
 
 type Errors = Partial<Record<'name' | 'speciality', string>>;
 
 function BecomeMaster() {
-  const userId = useAuthStore((state) => state.userId);
-  const token = useAuthStore((state) => state.token);
-  const navigate = useNavigate();
-  const location = useLocation();
-  const showToast = useToast();
-
   const [name, setName] = useState('');
   const [speciality, setSpeciality] = useState('');
   const [errors, setErrors] = useState<Errors>({});
-
-  const submitMutation = useMutation({
-    mutationFn: () => {
-      if (!token) {
-        throw new Error('Не найден токен авторизации');
-      }
-
-      return masterService.requestMaster({
-        token,
-        payload: {
-          name: name.trim(),
-          speciality: speciality.trim(),
-        },
-      });
-    },
-    onSuccess: async () => {
-      showToast('success', 'Заявка отправлена');
-      await queryClient.invalidateQueries({
-        queryKey: ['user-details', userId],
-      });
-
-      const background = location.state?.background;
-      navigate(background?.pathname || '/');
-    },
-  });
+  const submitMutation = useRequestMaster();
 
   const validateForm = () => {
     const nextErrors: Errors = {};
@@ -62,7 +27,10 @@ function BecomeMaster() {
     if (!validateForm()) {
       return;
     }
-    submitMutation.mutate();
+    submitMutation.mutate({
+      name: name.trim(),
+      speciality: speciality.trim(),
+    });
   };
 
   return (

@@ -8,6 +8,13 @@ export const ROLE_APPLICATION_STATUSES = {
 export type RoleApplicationStatus =
   (typeof ROLE_APPLICATION_STATUSES)[keyof typeof ROLE_APPLICATION_STATUSES];
 
+export interface RoleApplication {
+  status: RoleApplicationStatus;
+  lastUpdated: string | null;
+  rejectReason: string | null;
+  notificationRead: boolean;
+}
+
 export interface User {
   id: number;
   phone: string;
@@ -17,6 +24,8 @@ export interface User {
   createdAt: string;
   landlordRoleStatus: RoleApplicationStatus;
   masterRoleStatus: RoleApplicationStatus;
+  landlordApplication: RoleApplication | null;
+  masterApplication: RoleApplication | null;
 }
 
 export const USER_ROLES = {
