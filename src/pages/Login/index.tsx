@@ -68,7 +68,10 @@ function Login() {
   };
 
   const handleDone = () => {
-    navigate(background?.pathname || '/');
+    const from =
+      typeof location.state?.from === 'string' ? location.state.from : '';
+
+    navigate(from && from !== '/login' ? from : background?.pathname || '/');
   };
 
   return (

@@ -128,6 +128,9 @@ function AppRoutes() {
   const shouldLeaveLogin =
     location.pathname === '/login' &&
     enteredLoginWhileAuthenticated.current === true;
+  const isPublicPath =
+    location.pathname === '/' || location.pathname === '/login';
+  const returnPath = `${location.pathname}${location.search}`;
 
   if (userIsMissing) {
     return (
@@ -149,7 +152,10 @@ function AppRoutes() {
         actionLabel="Войти"
         onAction={() => {
           logout();
-          navigate('/login', { replace: true });
+          navigate('/login', {
+            replace: true,
+            state: { from: returnPath },
+          });
         }}
       />
     );
@@ -171,6 +177,10 @@ function AppRoutes() {
         }}
       />
     );
+  }
+
+  if (!user && !isUserLoading && !isPublicPath) {
+    return <Navigate to="/login" replace state={{ from: returnPath }} />;
   }
 
   return (
