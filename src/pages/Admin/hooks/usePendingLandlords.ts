@@ -20,5 +20,6 @@ export function usePendingLandlords() {
       });
     },
     enabled: !!token,
+    staleTime: 0,
   });
 }
