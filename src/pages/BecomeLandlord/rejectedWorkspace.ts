@@ -2,6 +2,22 @@ import type {
   LandlordWorkspacePhoto,
   LandlordWorkspaceSummary,
 } from '../../api/admin/listLandlords';
+
+const REJECTED_WORKSPACE_STATUS = 'REJECTED';
+
+export function pickRejectedWorkspace(
+  workspaces: LandlordWorkspaceSummary[] | undefined,
+): LandlordWorkspaceSummary | null {
+  if (!workspaces?.length) {
+    return null;
+  }
+
+  return (
+    workspaces
+      .filter((workspace) => workspace.status === REJECTED_WORKSPACE_STATUS)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0] ?? null
+  );
+}
 import {
   MIN_RENTAL_DURATIONS,
   WEEKDAYS,

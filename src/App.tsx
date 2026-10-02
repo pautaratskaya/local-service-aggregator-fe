@@ -15,6 +15,7 @@ import BecomeMaster from './pages/BecomeMaster';
 import Admin from './pages/Admin';
 import AdminApplications from './pages/Admin/Applications';
 import Profile from './pages/Profile';
+import Workspaces from './pages/Workspaces';
 import Header from './components/Header';
 import { ROLE_APPLICATION_STATUSES, USER_ROLES } from './types/user';
 import { ToastProvider } from './components/Toast';
@@ -72,6 +73,20 @@ function BecomeMasterRoute() {
   }
 
   return <BecomeMaster />;
+}
+
+function WorkspacesRoute() {
+  const { data: user, isLoading: isUserLoading } = useCurrentUser();
+
+  if (isUserLoading) {
+    return null;
+  }
+
+  if (!user?.roles.includes(USER_ROLES.LANDLORD)) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <Workspaces />;
 }
 
 function AdminRoute() {
@@ -194,6 +209,7 @@ function AppRoutes() {
             <Routes location={background || location}>
               <Route path="/" element={<Home />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/workspaces" element={<WorkspacesRoute />} />
               <Route path="/login" element={<Home />} />
               <Route path="/become-landlord" element={<Home />} />
               <Route path="/become-master" element={<Home />} />

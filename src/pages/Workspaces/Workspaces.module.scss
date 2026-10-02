@@ -1,0 +1,43 @@
+@use '../../variables.scss' as *;
+
+.workspaces {
+  min-height: 100%;
+  box-sizing: border-box;
+  padding: 16px;
+
+  h1 {
+    margin-top: 0;
+  }
+
+  .list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    .item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba($text-color, 0.08);
+
+      .name {
+        font-weight: 600;
+      }
+
+      .address {
+        color: $info-text-color;
+      }
+
+      .status {
+        color: $info-text-color;
+        font-size: 14px;
+      }
+    }
+  }
+
+  .empty {
+    margin: 0;
+    color: $info-text-color;
+  }
+}

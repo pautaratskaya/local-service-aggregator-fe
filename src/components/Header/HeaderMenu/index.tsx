@@ -13,7 +13,9 @@ interface HeaderMenuProps {
 function HeaderMenu({ user }: HeaderMenuProps) {
   const navigate = useNavigate();
   const logout = useAuthStore((state) => state.logout);
+  const selectedRole = useAuthStore((state) => state.selectedRole);
   const isAdmin = user.roles.includes(USER_ROLES.ADMIN);
+  const isLandlord = selectedRole === USER_ROLES.LANDLORD;
   const hasUnread = hasUnreadNotification(user);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -73,6 +75,17 @@ function HeaderMenu({ user }: HeaderMenuProps) {
                   Профиль
                 </Link>
               </li>
+              {isLandlord && (
+                <li>
+                  <Link
+                    className={styles.menuItem}
+                    to="/workspaces"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Мои помещения
+                  </Link>
+                </li>
+              )}
               {isAdmin && (
                 <li>
                   <Link

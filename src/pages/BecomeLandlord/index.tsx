@@ -8,6 +8,7 @@ import SelectInput from '../../components/SelectInput';
 import FileInput from '../../components/FileInput';
 import { LANDLORD_PHOTO_CONFIG } from '../../api/landlord/submitApplication';
 import { useCurrentUser } from '../../hooks/useCurrentUser';
+import { useLandlordWorkspaces } from '../../hooks/useLandlordWorkspaces';
 import {
   MIN_RENTAL_DURATIONS,
   toWeekdayApiValue,
@@ -20,13 +21,10 @@ import WorkingHoursInput, {
 } from '../../components/WorkingHoursInput';
 import LegalInfoInput from '../../components/LegalInfoInput';
 import CheckboxInput from '../../components/CheckboxInput';
-import {
-  pickRejectedWorkspace,
-  useLandlordWorkspaces,
-} from './hooks/useLandlordWorkspaces';
 import { useSubmitLandlordApplication } from './hooks/useSubmitLandlordApplication';
 import {
   applyRejectedWorkspace,
+  pickRejectedWorkspace,
   workspacePhotoToFile,
 } from './rejectedWorkspace';
 import styles from './BecomeLandlord.module.scss';
