@@ -4,6 +4,7 @@ import styles from './HeaderMenu.module.scss';
 import { BurgerIcon, CrossIcon } from '../../../icons';
 import { useAuthStore } from '../../../stores/authStore';
 import { USER_ROLES, type User } from '../../../types/user';
+import { hasUnreadNotification } from '../../../pages/Profile/ProfileNotifications';
 
 interface HeaderMenuProps {
   user: User;
@@ -13,6 +14,7 @@ function HeaderMenu({ user }: HeaderMenuProps) {
   const navigate = useNavigate();
   const logout = useAuthStore((state) => state.logout);
   const isAdmin = user.roles.includes(USER_ROLES.ADMIN);
+  const hasUnread = hasUnreadNotification(user);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -37,7 +39,7 @@ function HeaderMenu({ user }: HeaderMenuProps) {
     <>
       <button
         type="button"
-        className={styles.menuButton}
+        className={`${styles.menuButton} ${hasUnread ? styles.hasUnread : ''}`}
         aria-label="Меню"
         aria-expanded={isMenuOpen}
         onClick={() => setIsMenuOpen(true)}
@@ -64,7 +66,7 @@ function HeaderMenu({ user }: HeaderMenuProps) {
             <ul className={styles.menuList}>
               <li>
                 <Link
-                  className={styles.menuItem}
+                  className={`${styles.menuItem} ${hasUnread ? styles.hasUnread : ''}`}
                   to="/profile"
                   onClick={() => setIsMenuOpen(false)}
                 >

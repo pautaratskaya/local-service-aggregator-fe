@@ -1,6 +1,7 @@
 @use '../../../variables.scss' as *;
 
 .menuButton {
+  position: relative;
   display: flex;
   flex-shrink: 0;
   align-items: center;
@@ -13,6 +14,17 @@
   color: rgba($text-color, 0.45);
   background: rgba($text-color, 0.06);
   cursor: pointer;
+
+  &.hasUnread::after {
+    content: '';
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: $error-color;
+  }
 
   &:hover {
     color: $text-color;
@@ -93,6 +105,20 @@
       text-align: left;
       text-decoration: none;
       cursor: pointer;
+
+      &.hasUnread {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        &::after {
+          content: '';
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: $error-color;
+        }
+      }
 
       &:hover {
         background: rgba($text-color, 0.06);

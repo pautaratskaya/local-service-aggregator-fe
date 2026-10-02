@@ -9,6 +9,13 @@ import { useMarkRoleNotificationRead } from '../hooks/useMarkRoleNotificationRea
 import { getLandlordStatusText, getMasterStatusText } from '../statusText';
 import styles from './ProfileNotifications.module.scss';
 
+export function hasUnreadNotification(user: User): boolean {
+  return (
+    isUnreadDecision(user.landlordApplication ?? null) ||
+    isUnreadDecision(user.masterApplication ?? null)
+  );
+}
+
 export function isUnreadDecision(application: RoleApplication | null): boolean {
   if (!application || application.notificationRead) {
     return false;
