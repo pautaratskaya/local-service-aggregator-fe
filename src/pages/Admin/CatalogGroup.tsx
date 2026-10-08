@@ -163,7 +163,7 @@ function AdminCatalogGroup() {
                     >
                       {({ button, form }) => (
                         <>
-                          {button && <div className={styles.header}>{button}</div>}
+                          {button}
                           {form}
                     {workspaceType.services.length ? (
                       <ul>

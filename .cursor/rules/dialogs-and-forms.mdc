@@ -1,0 +1,22 @@
+---
+description: Modal scroll lock, Enter to submit, Esc to close
+alwaysApply: true
+---
+
+# Dialogs and forms
+
+## Scroll lock
+
+Every modal calls `useDialogLock` from `src/hooks/useDialogLock.ts` while it is open. Pass `active` when the modal can stay mounted while closed.
+
+```tsx
+useDialogLock(open);
+```
+
+## Enter submits
+
+Every action in a modal or form submits on Enter: the primary action runs from the form `onSubmit`, and the control is `type="submit"`.
+
+## Esc closes
+
+Anything that can close closes on Esc: modals, dialogs, and inline forms. Esc runs the same close handler as the cancel control.
