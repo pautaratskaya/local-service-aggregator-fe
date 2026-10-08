@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useCallback, useRef } from 'react';
+import { useDialogLock } from '../../hooks/useDialogLock';
 import { useTextOverflow } from '../../hooks/useTextOverflow';
 import { CrossIcon } from '../../icons';
 import styles from './Modal.module.scss';
@@ -14,6 +15,7 @@ export default function Modal({ children, title }: ModalProps) {
   const location = useLocation();
   const titleRef = useRef<HTMLHeadingElement>(null);
   const showTooltip = useTextOverflow(titleRef, title);
+  useDialogLock();
 
   const handleClose = useCallback(() => {
     const background = location.state?.background;
@@ -35,16 +37,6 @@ export default function Modal({ children, title }: ModalProps) {
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
   }, [handleClose]);
-
-  // Prevent background page scrolling when modal is open
-  useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
-    return () => {
-      document.body.style.overflow = originalOverflow;
-    };
-  }, []);
 
   return (
     <div className={styles.modalOverlay} onClick={handleClose}>

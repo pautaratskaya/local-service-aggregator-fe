@@ -8,6 +8,130 @@
   h1 {
     margin-top: 0;
   }
+
+  .catalogSection {
+    margin: 0 0 16px;
+    color: $info-text-color;
+  }
+
+  .menu {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .catalogBack {
+    margin: 0 0 8px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: $info-text-color;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .catalog {
+    margin: 0 0 16px;
+    padding: 0;
+    list-style: none;
+
+    ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .catalogItem {
+      padding: 12px 0;
+      border-bottom: 1px solid rgba($text-color, 0.08);
+
+      &.catalogItemOpen {
+        margin: 8px 0;
+        padding: 12px;
+        border: none;
+        border-radius: 16px;
+        background-color: $secondary-button-hover-background-color;
+      }
+    }
+
+    .catalogRow {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .catalogOpen {
+      flex: 1 1 12rem;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      padding: 0;
+      border: none;
+      background: none;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+
+      &:not(button) {
+        cursor: default;
+      }
+    }
+
+    .catalogName {
+      font-weight: 600;
+    }
+
+    .catalogDescription {
+      color: $info-text-color;
+    }
+
+    .catalogActions {
+      display: flex;
+      gap: 8px;
+
+      button {
+        width: auto;
+        height: 36px;
+        padding: 0 16px;
+        font-size: 14px;
+      }
+    }
+  }
+
+  .addCatalogItem {
+    margin-bottom: 16px;
+  }
+
+  .catalogServices {
+    margin-top: 12px;
+    padding-left: 16px;
+  }
+
+  .catalogForm {
+    animation: showCatalogForm 0.2s ease-out;
+  }
+
+  .catalogFormActions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+
+    button {
+      flex: 1 1 auto;
+    }
+
+    .saveButton {
+      flex: 1 1 auto;
+      display: flex;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
 }
 
 .list {
@@ -120,3 +244,49 @@
 .empty {
   color: $info-text-color;
 }
+
+.deleteDialogOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 16px;
+  background-color: rgba(0, 0, 0, 0.5);
+
+  @media (min-width: 768px) {
+    align-items: center;
+  }
+
+  .deleteDialog {
+    width: 100%;
+    max-width: 420px;
+    padding: 20px;
+    border-radius: 24px;
+    background-color: $background-color;
+
+    h2 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+
+    p {
+      margin: 0;
+      color: $info-text-color;
+    }
+  }
+}
+
+@keyframes showCatalogForm {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

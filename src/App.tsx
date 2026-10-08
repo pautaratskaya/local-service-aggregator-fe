@@ -14,6 +14,8 @@ import BecomeLandlord from './pages/BecomeLandlord';
 import BecomeMaster from './pages/BecomeMaster';
 import Admin from './pages/Admin';
 import AdminApplications from './pages/Admin/Applications';
+import AdminCatalog from './pages/Admin/Catalog';
+import AdminCatalogGroup from './pages/Admin/CatalogGroup';
 import Profile from './pages/Profile';
 import Workspaces from './pages/Workspaces';
 import AddWorkspace from './pages/Workspaces/AddWorkspace';
@@ -218,6 +220,8 @@ function AppRoutes() {
               <Route path="/admin" element={<AdminRoute />}>
                 <Route index element={<Admin />} />
                 <Route path="applications" element={<AdminApplications />} />
+                <Route path="catalog" element={<AdminCatalog />} />
+                <Route path="catalog/:groupId" element={<AdminCatalogGroup />} />
               </Route>
             </Routes>
           </div>

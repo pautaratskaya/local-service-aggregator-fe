@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useDialogLock } from '../../../hooks/useDialogLock';
 import styles from './HeaderMenu.module.scss';
 import { BurgerIcon, CrossIcon } from '../../../icons';
 import { useAuthStore } from '../../../stores/authStore';
@@ -18,6 +19,7 @@ function HeaderMenu({ user }: HeaderMenuProps) {
   const isLandlord = selectedRole === USER_ROLES.LANDLORD;
   const hasUnread = hasUnreadNotification(user);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  useDialogLock(isMenuOpen);
 
   useEffect(() => {
     if (!isMenuOpen) {
