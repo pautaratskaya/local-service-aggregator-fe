@@ -6,13 +6,18 @@ type AddCatalogItemProps = {
   label: string;
   dismissKey?: number | null;
   onOpen?: () => void;
-  children: (onClose: () => void) => React.ReactNode;
+  form: (onClose: () => void) => React.ReactNode;
+  children: (view: {
+    button: React.ReactNode;
+    form: React.ReactNode;
+  }) => React.ReactNode;
 };
 
 function AddCatalogItem({
   label,
   dismissKey,
   onOpen,
+  form,
   children,
 }: AddCatalogItemProps) {
   const [open, setOpen] = useState(false);
@@ -26,22 +31,24 @@ function AddCatalogItem({
     previousDismissKey.current = dismissKey;
   }, [dismissKey]);
 
-  if (open) {
-    return children(() => setOpen(false));
-  }
+  const close = () => setOpen(false);
 
-  return (
-    <Button
-      type="button"
-      className={styles.addCatalogItem}
-      onClick={() => {
-        onOpen?.();
-        setOpen(true);
-      }}
-    >
-      {label}
-    </Button>
-  );
+  return children({
+    button: open ? null : (
+      <Button
+        type="button"
+        cta
+        className={styles.addCatalogItem}
+        onClick={() => {
+          onOpen?.();
+          setOpen(true);
+        }}
+      >
+        {label}
+      </Button>
+    ),
+    form: open ? form(close) : null,
+  });
 }
 
 export default AddCatalogItem;

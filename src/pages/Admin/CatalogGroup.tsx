@@ -3,7 +3,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import FetchErrorNotice from '../../components/FetchErrorNotice';
 import PageLoader from '../../components/PageLoader';
 import AddCatalogItem from './AddCatalogItem';
-import CatalogDeleteDialog from './CatalogDeleteDialog';
+import CatalogDeleteDialog, {
+  type CatalogDeleteKind,
+} from './CatalogDeleteDialog';
 import CatalogDetailsForm from './CatalogDetailsForm';
 import CatalogRow from './CatalogRow';
 import ServiceItemForm, { CreateServiceItemForm } from './ServiceItemForm';
@@ -26,7 +28,7 @@ function AdminCatalogGroup() {
     id: number;
     name: string;
     kind: 'type' | 'service';
-    nested?: string;
+    cascade?: CatalogDeleteKind;
   } | null>(null);
   const deleteServiceItem = useDeleteServiceItem();
   const deleteWorkspaceType = useDeleteWorkspaceType();
@@ -72,8 +74,6 @@ function AdminCatalogGroup() {
   return (
     <div className={styles.admin}>
       {backToCatalog}
-      <h1>{group.name}</h1>
-      <p className={styles.catalogSection}>Типы помещений</p>
       <AddCatalogItem
         label="Добавить тип помещения"
         dismissKey={openTypeId ?? editingTypeId}
@@ -82,8 +82,7 @@ function AdminCatalogGroup() {
           setEditingTypeId(null);
           setEditingServiceId(null);
         }}
-      >
-        {(onClose) => (
+        form={(onClose) => (
           <CatalogDetailsForm
             onCancel={onClose}
             isPending={createWorkspaceType.isPending}
@@ -98,8 +97,16 @@ function AdminCatalogGroup() {
             }}
           />
         )}
-      </AddCatalogItem>
-      {group.workspaceTypes.length ? (
+      >
+        {({ button, form }) => (
+          <>
+            <div className={styles.header}>
+              <h1>{group.name}</h1>
+              {button}
+            </div>
+            <p className={styles.catalogSection}>Типы помещений</p>
+            {form}
+            {group.workspaceTypes.length ? (
         <ul className={styles.catalog}>
           {group.workspaceTypes.map((workspaceType) => {
             const isOpen = openTypeId === workspaceType.id;
@@ -128,8 +135,10 @@ function AdminCatalogGroup() {
                     id: workspaceType.id,
                     name: workspaceType.name,
                     kind: 'type',
-                    nested:
-                      workspaceType.services.length > 0 ? 'услуги' : undefined,
+                    cascade:
+                      workspaceType.services.length > 0
+                        ? 'services'
+                        : undefined,
                   });
                 }}
               >
@@ -145,14 +154,17 @@ function AdminCatalogGroup() {
                       label="Добавить услугу"
                       dismissKey={editingServiceId}
                       onOpen={() => setEditingServiceId(null)}
-                    >
-                      {(onClose) => (
+                      form={(onClose) => (
                         <CreateServiceItemForm
                           workspaceTypeId={workspaceType.id}
                           onClose={onClose}
                         />
                       )}
-                    </AddCatalogItem>
+                    >
+                      {({ button, form }) => (
+                        <>
+                          {button && <div className={styles.header}>{button}</div>}
+                          {form}
                     {workspaceType.services.length ? (
                       <ul>
                         {workspaceType.services.map((service) => (
@@ -183,6 +195,9 @@ function AdminCatalogGroup() {
                     ) : (
                       <p className={styles.empty}>Услуг нет</p>
                     )}
+                        </>
+                      )}
+                    </AddCatalogItem>
                   </div>
                 )}
               </CatalogRow>
@@ -191,11 +206,14 @@ function AdminCatalogGroup() {
         </ul>
       ) : (
         <p className={styles.empty}>Типов помещений нет</p>
-      )}
+            )}
+          </>
+        )}
+      </AddCatalogItem>
       {itemToDelete && (
         <CatalogDeleteDialog
           name={itemToDelete.name}
-          nested={itemToDelete.nested}
+          kind={itemToDelete.cascade}
           isPending={
             deleteWorkspaceType.isPending || deleteServiceItem.isPending
           }

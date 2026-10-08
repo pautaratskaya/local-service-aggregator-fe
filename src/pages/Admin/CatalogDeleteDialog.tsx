@@ -3,17 +3,26 @@ import { useDialogLock } from '../../hooks/useDialogLock';
 import styles from './Admin.module.scss';
 import { useCatalogFormKeys } from './useCatalogFormKeys';
 
+export type CatalogDeleteKind = 'services' | 'types' | 'typesAndServices';
+
 type CatalogDeleteDialogProps = {
   name: string;
-  nested?: string;
+  kind?: CatalogDeleteKind;
   isPending?: boolean;
   onCancel: () => void;
   onConfirm: () => void;
 };
 
+const deleteCopy: Record<CatalogDeleteKind, string> = {
+  services: 'Вместе с этим удалятся все услуги.',
+  types: 'Вместе с этим удалится всё внутри: типы помещений.',
+  typesAndServices:
+    'Вместе с этим удалится всё внутри: типы помещений и услуги.',
+};
+
 function CatalogDeleteDialog({
   name,
-  nested,
+  kind,
   isPending = false,
   onCancel,
   onConfirm,
@@ -36,13 +45,7 @@ function CatalogDeleteDialog({
         onClick={(event) => event.stopPropagation()}
       >
         <h2>Удалить «{name}»?</h2>
-        {nested === 'услуги' ? (
-          <p>Удалятся все услуги.</p>
-        ) : nested ? (
-          <p>Вместе с этим удалится всё внутри: {nested}.</p>
-        ) : (
-          <p>Это действие нельзя отменить.</p>
-        )}
+        <p>{kind ? deleteCopy[kind] : 'Это действие нельзя отменить.'}</p>
         <div className={styles.catalogFormActions}>
           <Button type="button" onClick={onCancel} disabled={isPending}>
             Отмена

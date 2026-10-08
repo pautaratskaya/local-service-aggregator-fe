@@ -9,6 +9,29 @@
     margin-top: 0;
   }
 
+  .header {
+    display: flex;
+    flex-wrap: wrap-reverse;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+
+    h1 {
+      flex: 1 1 auto;
+      margin: 0;
+    }
+
+    .addCatalogItem {
+      flex: 0 0 auto;
+      margin-left: auto;
+      width: auto;
+      height: 40px;
+      padding: 0 16px;
+      white-space: nowrap;
+    }
+  }
+
   .catalogSection {
     margin: 0 0 16px;
     color: $info-text-color;
@@ -99,10 +122,6 @@
         font-size: 14px;
       }
     }
-  }
-
-  .addCatalogItem {
-    margin-bottom: 16px;
   }
 
   .catalogServices {

@@ -3,6 +3,7 @@ import { adminService } from '../../../api/admin/adminService';
 import { useToast } from '../../../components/Toast/toastContext';
 import { useAuthStore } from '../../../stores/authStore';
 import { catalogTreeQueryKey } from './useCatalogTree';
+import { serviceItemQueryKey } from './useGetServiceItem';
 
 export function useDeleteServiceItem() {
   const token = useAuthStore((state) => state.token);
@@ -17,9 +18,10 @@ export function useDeleteServiceItem() {
 
       return adminService.deleteServiceItem(token, id);
     },
-    onSuccess: async () => {
+    onSuccess: async (_data, id) => {
       showToast('success', 'Услуга удалена');
       await queryClient.invalidateQueries({ queryKey: catalogTreeQueryKey });
+      queryClient.removeQueries({ queryKey: serviceItemQueryKey(id) });
     },
     onError: (error) => {
       showToast(
