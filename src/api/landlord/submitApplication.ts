@@ -69,7 +69,7 @@ export function buildWorkspaceFormData(
   formData.append('name', payload.placeName);
   formData.append('city', payload.city);
   formData.append('address', payload.address);
-  formData.append('kind', payload.placeTypes[0] ?? '');
+  formData.append('workspaceTypeId', String(payload.workspaceTypeId));
 
   if (payload.description) {
     formData.append('description', payload.description);

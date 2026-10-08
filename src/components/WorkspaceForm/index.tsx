@@ -1,4 +1,5 @@
 import { useLayoutEffect, useMemo, useState } from 'react';
+import { useWorkspaceTypes } from '../../hooks/useWorkspaceTypes';
 import type { LandlordWorkspaceSummary } from '../../api/admin/listLandlords';
 import { LANDLORD_PHOTO_CONFIG } from '../../api/landlord/submitApplication';
 import Button from '../Button';
@@ -9,9 +10,7 @@ import LegalInfoInput from '../LegalInfoInput';
 import SelectInput from '../SelectInput';
 import TextareaInput from '../TextareaInput';
 import TextInput from '../TextInput';
-import WorkingHoursInput, {
-  DEFAULT_WORKING_DAYS,
-} from '../WorkingHoursInput';
+import WorkingHoursInput, { DEFAULT_WORKING_DAYS } from '../WorkingHoursInput';
 import {
   applyRejectedWorkspace,
   workspacePhotoToFile,
@@ -25,13 +24,6 @@ import {
 } from '../../types/landlord';
 import styles from './WorkspaceForm.module.scss';
 
-// TODO: request from backend
-const PLACE_TYPE_OPTIONS = [
-  { value: 'Парикмахерское кресло', label: 'Парикмахерское кресло' },
-  { value: 'Кабинет для маникюра', label: 'Кабинет для маникюра' },
-  { value: 'Массажный кабинет', label: 'Массажный кабинет' },
-  { value: 'Студия', label: 'Студия' },
-];
 const MIN_RENTAL_OPTIONS = [
   { value: String(MIN_RENTAL_DURATIONS.MINUTES_30), label: '30 мин' },
   { value: String(MIN_RENTAL_DURATIONS.MINUTES_60), label: '1 час' },
@@ -61,6 +53,8 @@ function WorkspaceForm({
   initialWorkspace,
   onSubmit,
 }: WorkspaceFormProps) {
+  const { data: workspaceTypes = [], isError: workspaceTypesError } =
+    useWorkspaceTypes();
   const initialWorkspaceId = initialWorkspace?.id;
   const [placeName, setPlaceName] = useState('');
   const [city, setCity] = useState('');
@@ -106,7 +100,7 @@ function WorkspaceForm({
 
     let cancelled = false;
     const photosToLoad = [...initialWorkspace.photos].sort(
-      (a, b) => a.order - b.order,
+      (a, b) => a.order - b.order
     );
 
     if (photosToLoad.length === 0) {
@@ -158,7 +152,8 @@ function WorkspaceForm({
   const validateForm = () => {
     const nextErrors: Errors = {};
 
-    if (!placeName.trim()) nextErrors.placeName = 'Введите название рабочего места';
+    if (!placeName.trim())
+      nextErrors.placeName = 'Введите название рабочего места';
     if (!city.trim()) nextErrors.city = 'Введите город';
     if (!address.trim()) nextErrors.address = 'Введите адрес';
     if (!placeType) nextErrors.placeType = 'Выберите тип рабочего места';
@@ -182,8 +177,8 @@ function WorkspaceForm({
       photos.some(
         (photo) =>
           !LANDLORD_PHOTO_CONFIG.ALLOWED_MIME_TYPES.includes(
-            photo.type as never,
-          ),
+            photo.type as never
+          )
       )
     ) {
       nextErrors.photos =
@@ -191,7 +186,7 @@ function WorkspaceForm({
     }
     if (
       photos.some(
-        (photo) => photo.size > LANDLORD_PHOTO_CONFIG.MAX_FILE_SIZE_BYTES,
+        (photo) => photo.size > LANDLORD_PHOTO_CONFIG.MAX_FILE_SIZE_BYTES
       )
     ) {
       nextErrors.photos = 'Размер каждого файла должен быть не больше 10 МБ';
@@ -224,7 +219,7 @@ function WorkspaceForm({
     setWorkingDays((prev) =>
       prev.includes(day)
         ? prev.filter((value) => value !== day)
-        : [...prev, day],
+        : [...prev, day]
     );
   };
 
@@ -237,7 +232,7 @@ function WorkspaceForm({
       placeName: placeName.trim(),
       city: city.trim(),
       address: address.trim(),
-      placeTypes: [placeType],
+      workspaceTypeId: Number(placeType),
       description: descriptionText.trim(),
       workingHours: {
         from: workFrom,
@@ -296,9 +291,17 @@ function WorkspaceForm({
           value={placeType}
           onChange={(e) => setPlaceType(e.target.value)}
           aria-label="Тип рабочего места"
-          options={PLACE_TYPE_OPTIONS}
+          options={workspaceTypes.map((type) => ({
+            value: String(type.id),
+            label: type.workspaceName,
+          }))}
           placeholder="Выберите тип"
-          error={errors.placeType}
+          error={
+            errors.placeType ??
+            (workspaceTypesError
+              ? 'Не удалось загрузить типы рабочих мест'
+              : undefined)
+          }
         />
         <TextareaInput
           label="Описание рабочего места"
@@ -326,7 +329,7 @@ function WorkspaceForm({
           value={String(minRentalDurationMinutes)}
           onChange={(e) =>
             setMinRentalDurationMinutes(
-              Number(e.target.value) as MinRentalDurationMinutes,
+              Number(e.target.value) as MinRentalDurationMinutes
             )
           }
           aria-label="Минимальное время аренды"

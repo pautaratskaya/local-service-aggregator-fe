@@ -6,7 +6,7 @@ import type {
 const REJECTED_WORKSPACE_STATUS = 'REJECTED';
 
 export function pickRejectedWorkspace(
-  workspaces: LandlordWorkspaceSummary[] | undefined,
+  workspaces: LandlordWorkspaceSummary[] | undefined
 ): LandlordWorkspaceSummary | null {
   if (!workspaces?.length) {
     return null;
@@ -58,7 +58,9 @@ export function applyRejectedWorkspace(
   setters.setPlaceName(workspace.name);
   setters.setCity(workspace.city);
   setters.setAddress(workspace.address);
-  setters.setPlaceType(workspace.kind);
+  setters.setPlaceType(
+    workspace.workspaceTypeId ? String(workspace.workspaceTypeId) : ''
+  );
   setters.setDescription(workspace.description ?? '');
   setters.setWorkFrom(timeValue(workspace.openTime));
   setters.setWorkTo(timeValue(workspace.closeTime));

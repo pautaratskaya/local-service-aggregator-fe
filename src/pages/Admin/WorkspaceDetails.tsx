@@ -2,6 +2,7 @@ import type {
   LandlordResponse,
   LandlordWorkspaceSummary,
 } from '../../api/admin/listLandlords';
+import { useWorkspaceTypes } from '../../hooks/useWorkspaceTypes';
 import { formatDateTime, formatOptional } from '../../helpers';
 import {
   formatMinRent,
@@ -17,6 +18,11 @@ type WorkspaceDetailsProps = {
 };
 
 function WorkspaceDetails({ request, workspace }: WorkspaceDetailsProps) {
+  const { data: workspaceTypes = [] } = useWorkspaceTypes();
+  const workspaceTypeName =
+    workspaceTypes.find((type) => type.id === workspace.workspaceTypeId)
+      ?.workspaceName ?? '';
+
   return (
     <dl className={styles.details}>
       <div>
@@ -41,7 +47,7 @@ function WorkspaceDetails({ request, workspace }: WorkspaceDetailsProps) {
       </div>
       <div>
         <dt>Тип рабочего места</dt>
-        <dd>{workspace.kind}</dd>
+        <dd>{workspaceTypeName}</dd>
       </div>
       <div>
         <dt>Описание</dt>

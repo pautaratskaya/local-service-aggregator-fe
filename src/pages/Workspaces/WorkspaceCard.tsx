@@ -1,4 +1,5 @@
 import type { LandlordWorkspaceSummary } from '../../api/admin/listLandlords';
+import { useWorkspaceTypes } from '../../hooks/useWorkspaceTypes';
 import { TriangleDownIcon } from '../../icons';
 import { formatDateTime, formatOptional } from '../../helpers';
 import {
@@ -15,6 +16,10 @@ type WorkspaceCardProps = {
 };
 
 function WorkspaceCard({ workspace, isExpanded, onToggle }: WorkspaceCardProps) {
+  const { data: workspaceTypes = [] } = useWorkspaceTypes();
+  const workspaceTypeName =
+    workspaceTypes.find((type) => type.id === workspace.workspaceTypeId)
+      ?.workspaceName ?? '';
   const photos = [...workspace.photos].sort((a, b) => a.order - b.order);
 
   return (
@@ -58,7 +63,7 @@ function WorkspaceCard({ workspace, isExpanded, onToggle }: WorkspaceCardProps) 
           </div>
           <div>
             <dt>Тип рабочего места</dt>
-            <dd>{workspace.kind}</dd>
+            <dd>{workspaceTypeName}</dd>
           </div>
           <div>
             <dt>Описание</dt>

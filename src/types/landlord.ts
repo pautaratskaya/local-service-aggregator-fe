@@ -50,7 +50,7 @@ export interface LandlordApplicationFormData {
   placeName: string;
   city: string;
   address: string;
-  placeTypes: string[];
+  workspaceTypeId: number;
   description: string;
   workingHours: LandlordWorkingHours;
   minRentalDurationMinutes: MinRentalDurationMinutes;

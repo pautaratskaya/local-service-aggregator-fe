@@ -34,16 +34,16 @@ function LoginChooseRole({ onNext, user }: LoginChooseRoleProps) {
           {user?.roles
             .filter((role) => role !== USER_ROLES.ADMIN)
             .map((role) => (
-            <RoleCard
-              key={user.id}
-              firstName={user.firstName}
-              lastName={user.lastName}
-              role={role}
-              phone={user.phone}
-              onSelect={() => handleRoleSelect(role)}
-              onDelete={() => handleRoleDelete(role)}
-            />
-          ))}
+              <RoleCard
+                key={`${user.id}-${role}`}
+                firstName={user.firstName}
+                lastName={user.lastName}
+                role={role}
+                phone={user.phone}
+                onSelect={() => handleRoleSelect(role)}
+                onDelete={() => handleRoleDelete(role)}
+              />
+            ))}
         </div>
       </IllustratedMessage>
 

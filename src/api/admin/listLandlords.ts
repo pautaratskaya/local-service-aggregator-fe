@@ -12,7 +12,6 @@ export interface LandlordWorkspaceSummary {
   name: string;
   city: string;
   address: string;
-  kind: string;
   description: string;
   openTime: string;
   closeTime: string;
@@ -25,6 +24,7 @@ export interface LandlordWorkspaceSummary {
   status: string;
   createdAt: string;
   photos: LandlordWorkspacePhoto[];
+  workspaceTypeId: number;
 }
 
 export interface LandlordResponse {
