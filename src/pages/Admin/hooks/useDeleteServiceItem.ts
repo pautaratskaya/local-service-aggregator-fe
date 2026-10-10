@@ -23,11 +23,5 @@ export function useDeleteServiceItem() {
       await queryClient.invalidateQueries({ queryKey: catalogTreeQueryKey });
       queryClient.removeQueries({ queryKey: serviceItemQueryKey(id) });
     },
-    onError: (error) => {
-      showToast(
-        'error',
-        error instanceof Error ? error.message : 'Не удалось удалить услугу',
-      );
-    },
   });
 }

@@ -300,6 +300,11 @@
     p {
       margin: 0;
       color: $info-text-color;
+
+      &.deleteError {
+        margin-top: 12px;
+        color: $error-color;
+      }
     }
   }
 }

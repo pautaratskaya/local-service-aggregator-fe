@@ -31,13 +31,5 @@ export function useDeleteWorkspaceType() {
       );
       queryClient.removeQueries({ queryKey: workspaceTypeQueryKey(id) });
     },
-    onError: (error) => {
-      showToast(
-        'error',
-        error instanceof Error
-          ? error.message
-          : 'Не удалось удалить тип помещения',
-      );
-    },
   });
 }

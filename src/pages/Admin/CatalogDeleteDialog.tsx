@@ -9,6 +9,7 @@ type CatalogDeleteDialogProps = {
   name: string;
   kind?: CatalogDeleteKind;
   isPending?: boolean;
+  error?: unknown;
   onCancel: () => void;
   onConfirm: () => void;
 };
@@ -24,6 +25,7 @@ function CatalogDeleteDialog({
   name,
   kind,
   isPending = false,
+  error,
   onCancel,
   onConfirm,
 }: CatalogDeleteDialogProps) {
@@ -46,6 +48,11 @@ function CatalogDeleteDialog({
       >
         <h2>Удалить «{name}»?</h2>
         <p>{kind ? deleteCopy[kind] : 'Это действие нельзя отменить.'}</p>
+        {error != null && (
+          <p className={styles.deleteError}>
+            {error instanceof Error ? error.message : 'Не удалось удалить'}
+          </p>
+        )}
         <div className={styles.catalogFormActions}>
           <Button type="button" onClick={onCancel} disabled={isPending}>
             Отмена

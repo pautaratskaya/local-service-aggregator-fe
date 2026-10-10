@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FetchErrorNotice from '../../components/FetchErrorNotice';
 import PageLoader from '../../components/PageLoader';
@@ -28,6 +28,14 @@ function AdminCatalog() {
   const createServiceGroup = useCreateServiceGroup();
   const groups = data ?? [];
   const waiting = isLoading || (isError && isFetching);
+
+  useEffect(() => {
+    if (groupToDelete) {
+      return;
+    }
+
+    deleteServiceGroup.reset();
+  }, [groupToDelete, deleteServiceGroup.reset]);
 
   return (
     <div className={styles.admin}>
@@ -119,6 +127,7 @@ function AdminCatalog() {
           name={groupToDelete.name}
           kind={groupToDelete.kind}
           isPending={deleteServiceGroup.isPending}
+          error={deleteServiceGroup.error}
           onCancel={() => setGroupToDelete(null)}
           onConfirm={() => {
             setEditingId(null);

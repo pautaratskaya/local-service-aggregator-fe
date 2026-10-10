@@ -1,4 +1,8 @@
 import { API_BASE_URL } from '../config';
+import {
+  CatalogItemInUseError,
+  catalogItemInUseErrorFromResponse,
+} from './catalogItemInUse';
 
 export async function adminRequest(
   path: string,
@@ -15,11 +19,21 @@ export async function adminRequest(
     });
 
     if (!response.ok) {
+      const inUseError = await catalogItemInUseErrorFromResponse(response);
+
+      if (inUseError) {
+        throw inUseError;
+      }
+
       throw new Error(`Ошибка сервера: ${response.status}`);
     }
 
     return response;
   } catch (error) {
+    if (error instanceof CatalogItemInUseError) {
+      throw error;
+    }
+
     if (error instanceof Error && error.message.startsWith('Ошибка сервера')) {
       throw error;
     }

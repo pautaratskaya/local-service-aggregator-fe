@@ -26,11 +26,5 @@ export function useDeleteServiceGroup() {
       );
       queryClient.removeQueries({ queryKey: serviceGroupQueryKey(id) });
     },
-    onError: (error) => {
-      showToast(
-        'error',
-        error instanceof Error ? error.message : 'Не удалось удалить группу',
-      );
-    },
   });
 }

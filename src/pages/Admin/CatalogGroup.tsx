@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import FetchErrorNotice from '../../components/FetchErrorNotice';
 import PageLoader from '../../components/PageLoader';
@@ -35,6 +35,15 @@ function AdminCatalogGroup() {
   const createWorkspaceType = useCreateWorkspaceType();
   const group = data?.find((item) => String(item.id) === groupId);
   const waiting = isLoading || (isError && isFetching);
+
+  useEffect(() => {
+    if (itemToDelete) {
+      return;
+    }
+
+    deleteWorkspaceType.reset();
+    deleteServiceItem.reset();
+  }, [itemToDelete, deleteWorkspaceType.reset, deleteServiceItem.reset]);
 
   const backToCatalog = (
     <button
@@ -216,6 +225,11 @@ function AdminCatalogGroup() {
           kind={itemToDelete.cascade}
           isPending={
             deleteWorkspaceType.isPending || deleteServiceItem.isPending
+          }
+          error={
+            itemToDelete.kind === 'type'
+              ? deleteWorkspaceType.error
+              : deleteServiceItem.error
           }
           onCancel={() => setItemToDelete(null)}
           onConfirm={() => {

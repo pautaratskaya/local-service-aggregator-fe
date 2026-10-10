@@ -15,10 +15,7 @@ export async function getServiceGroup(
   token: string,
   id: number,
 ): Promise<AdminServiceGroup> {
-  const response = await adminRequest(
-    `/api/admin/service-groups/${id}`,
-    token,
-  );
+  const response = await adminRequest(`/api/admin/service-groups/${id}`, token);
 
   return response.json() as Promise<AdminServiceGroup>;
 }
@@ -47,17 +44,13 @@ export async function createServiceGroup(
   token: string,
   payload: AdminServiceGroupPayload,
 ): Promise<AdminServiceGroup> {
-  const response = await adminRequest(
-    '/api/admin/service-groups',
-    token,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
+  const response = await adminRequest('/api/admin/service-groups', token, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
     },
-  );
+    body: JSON.stringify(payload),
+  });
 
   return response.json() as Promise<AdminServiceGroup>;
 }
