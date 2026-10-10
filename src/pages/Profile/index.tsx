@@ -101,7 +101,11 @@ function Profile() {
               USER_ROLES.MASTER,
               user.masterRoleStatus
             )}
-            applyLabel="Стать мастером"
+            applyLabel={
+              user.masterRoleStatus === ROLE_APPLICATION_STATUSES.REJECTED
+                ? 'Исправить заявку'
+                : 'Стать мастером'
+            }
             onApply={() =>
               navigate('/become-master', { state: { background: location } })
             }

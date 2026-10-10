@@ -24,12 +24,14 @@ export function useRequestMaster() {
     },
     onSuccess: async () => {
       showToast('success', 'Заявка отправлена');
+      const background = location.state?.background;
+      navigate(
+        background ? `${background.pathname}${background.search}` : '/',
+        { replace: true },
+      );
       await queryClient.invalidateQueries({
         queryKey: userDetailsQueryKey(userId),
       });
-
-      const background = location.state?.background;
-      navigate(background?.pathname || '/');
     },
   });
 }

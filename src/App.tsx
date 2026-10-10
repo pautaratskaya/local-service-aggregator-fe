@@ -36,7 +36,18 @@ import './App.scss';
 const MISSING_USER_MESSAGE = 'Пользователь не найден';
 const INVALID_SESSION_MESSAGE = 'Сессия истекла. Войдите снова';
 
+function backgroundPath(
+  state: {
+    background?: { pathname: string; search?: string };
+  } | null,
+) {
+  const background = state?.background;
+
+  return background ? `${background.pathname}${background.search ?? ''}` : '/';
+}
+
 function BecomeLandlordRoute() {
+  const location = useLocation();
   const { data: user, isLoading: isUserLoading } = useCurrentUser();
 
   // PageLoader is already shown for the background route.
@@ -52,13 +63,14 @@ function BecomeLandlordRoute() {
       user.landlordRoleStatus === ROLE_APPLICATION_STATUSES.REJECTED);
 
   if (!canAccess) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={backgroundPath(location.state)} replace />;
   }
 
   return <BecomeLandlord />;
 }
 
 function BecomeMasterRoute() {
+  const location = useLocation();
   const { data: user, isLoading: isUserLoading } = useCurrentUser();
 
   if (isUserLoading) {
@@ -72,7 +84,7 @@ function BecomeMasterRoute() {
       user.masterRoleStatus === ROLE_APPLICATION_STATUSES.REJECTED);
 
   if (!canAccess) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={backgroundPath(location.state)} replace />;
   }
 
   return <BecomeMaster />;
@@ -221,7 +233,10 @@ function AppRoutes() {
                 <Route index element={<Admin />} />
                 <Route path="applications" element={<AdminApplications />} />
                 <Route path="catalog" element={<AdminCatalog />} />
-                <Route path="catalog/:groupId" element={<AdminCatalogGroup />} />
+                <Route
+                  path="catalog/:groupId"
+                  element={<AdminCatalogGroup />}
+                />
               </Route>
             </Routes>
           </div>

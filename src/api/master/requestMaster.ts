@@ -1,8 +1,11 @@
+import type { RoleApplicationStatus } from '../../types/user';
 import { API_BASE_URL } from '../config';
 
 export interface RequestMasterPayload {
   name: string;
   speciality: string;
+  city?: string;
+  description?: string;
 }
 
 export interface RequestMasterRequest {
@@ -16,13 +19,15 @@ export interface MasterProfile {
   speciality: string;
   photoUrl: string;
   averageRating: number;
+  city: string;
+  description: string;
 }
 
 // TODO: remove all the fields from response. we need only status: 200/400/etc.
 export interface RequestMasterResponse {
   userId: number;
   userName: string;
-  masterStatus: string;
+  masterStatus: RoleApplicationStatus;
   master: MasterProfile;
 }
 
@@ -46,6 +51,11 @@ export async function requestMaster({
       }
       if (response.status === 400) {
         throw new Error('Проверьте корректность данных формы');
+      }
+      if (response.status === 409) {
+        throw new Error(
+          'Заявка уже на рассмотрении или роль мастера уже подтверждена',
+        );
       }
       throw new Error(`Ошибка сервера: ${response.status}`);
     }
