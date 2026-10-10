@@ -5,6 +5,7 @@ type UseCatalogFormKeysArgs = {
   onSubmit: () => void;
   canSubmit: boolean;
   onShowErrors: () => void;
+  submitFromTextarea?: boolean;
 };
 
 export function useCatalogFormKeys({
@@ -12,11 +13,15 @@ export function useCatalogFormKeys({
   onSubmit,
   canSubmit,
   onShowErrors,
+  submitFromTextarea = false,
 }: UseCatalogFormKeysArgs) {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault();
+        if (submitFromTextarea) {
+          event.stopPropagation();
+        }
         onCancel();
         return;
       }
@@ -25,11 +30,17 @@ export function useCatalogFormKeys({
         return;
       }
 
-      if (event.target instanceof HTMLTextAreaElement) {
+      if (
+        !submitFromTextarea &&
+        event.target instanceof HTMLTextAreaElement
+      ) {
         return;
       }
 
       event.preventDefault();
+      if (submitFromTextarea) {
+        event.stopPropagation();
+      }
 
       if (!canSubmit) {
         onShowErrors();
@@ -39,7 +50,8 @@ export function useCatalogFormKeys({
       onSubmit();
     };
 
-    document.addEventListener('keydown', onKeyDown);
-    return () => document.removeEventListener('keydown', onKeyDown);
-  }, [onCancel, onSubmit, canSubmit, onShowErrors]);
+    document.addEventListener('keydown', onKeyDown, submitFromTextarea);
+    return () =>
+      document.removeEventListener('keydown', onKeyDown, submitFromTextarea);
+  }, [onCancel, onSubmit, canSubmit, onShowErrors, submitFromTextarea]);
 }

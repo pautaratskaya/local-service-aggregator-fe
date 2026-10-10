@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import Button from '../../components/Button';
 import TextareaInput from '../../components/TextareaInput';
+import { useCatalogFormKeys } from './useCatalogFormKeys';
 import styles from './Admin.module.scss';
 
 type ApplicationRowProps = {
@@ -13,6 +14,59 @@ type ApplicationRowProps = {
   onToggle: () => void;
 };
 
+function RejectForm({
+  isDeciding,
+  onCancel,
+  onReject,
+}: {
+  isDeciding: boolean;
+  onCancel: () => void;
+  onReject: (reason?: string) => void;
+}) {
+  const [rejectReason, setRejectReason] = useState('');
+
+  const submit = () => {
+    onReject(rejectReason.trim() || undefined);
+  };
+
+  useCatalogFormKeys({
+    onCancel,
+    onSubmit: submit,
+    canSubmit: !isDeciding,
+    onShowErrors: () => undefined,
+    submitFromTextarea: true,
+  });
+
+  return (
+    <form
+      className={styles.rejectForm}
+      onSubmit={(event) => {
+        event.preventDefault();
+
+        if (!isDeciding) {
+          submit();
+        }
+      }}
+    >
+      <TextareaInput
+        label="Причина отклонения"
+        value={rejectReason}
+        disabled={isDeciding}
+        autoFocus
+        onChange={(event) => setRejectReason(event.target.value)}
+      />
+      <div className={styles.rejectActions}>
+        <Button type="button" disabled={isDeciding} onClick={onCancel}>
+          Отмена
+        </Button>
+        <Button type="submit" disabled={isDeciding} cta>
+          Отклонить
+        </Button>
+      </div>
+    </form>
+  );
+}
+
 function ApplicationRow({
   summary,
   details,
@@ -23,11 +77,9 @@ function ApplicationRow({
   onToggle,
 }: ApplicationRowProps) {
   const [isRejectOpen, setIsRejectOpen] = useState(false);
-  const [rejectReason, setRejectReason] = useState('');
 
   const closeReject = () => {
     setIsRejectOpen(false);
-    setRejectReason('');
   };
 
   return (
@@ -71,40 +123,11 @@ function ApplicationRow({
             </div>
           )}
           {isRejectOpen && (
-            <form
-              className={styles.rejectForm}
-              onSubmit={(event) => {
-                event.preventDefault();
-                const reason = rejectReason.trim();
-
-                onReject(reason || undefined);
-              }}
-              onKeyDown={(event) => {
-                if (event.key === 'Escape') {
-                  event.preventDefault();
-                  closeReject();
-                }
-              }}
-            >
-              <TextareaInput
-                label="Причина отклонения"
-                value={rejectReason}
-                disabled={isDeciding}
-                onChange={(event) => setRejectReason(event.target.value)}
-              />
-              <div className={styles.rejectActions}>
-                <Button
-                  type="button"
-                  disabled={isDeciding}
-                  onClick={closeReject}
-                >
-                  Отмена
-                </Button>
-                <Button type="submit" disabled={isDeciding} cta>
-                  Отклонить
-                </Button>
-              </div>
-            </form>
+            <RejectForm
+              isDeciding={isDeciding}
+              onCancel={closeReject}
+              onReject={onReject}
+            />
           )}
         </div>
       </div>
