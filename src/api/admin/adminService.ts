@@ -1,6 +1,9 @@
 import { approveLandlord } from './approveLandlord';
+import { approveMaster } from './approveMaster';
 import { listLandlords } from './listLandlords';
+import { listMasters } from './listMasters';
 import { rejectLandlord } from './rejectLandlord';
+import { rejectMaster } from './rejectMaster';
 import {
   createServiceGroup,
   deleteServiceGroup,
@@ -24,6 +27,9 @@ export const adminService = {
   listLandlords,
   approveLandlord,
   rejectLandlord,
+  listMasters,
+  approveMaster,
+  rejectMaster,
   getServiceGroup,
   createServiceGroup,
   updateServiceGroup,

@@ -1,37 +1,34 @@
-import { useState } from 'react';
-import type {
-  LandlordResponse,
-  LandlordWorkspaceSummary,
-} from '../../api/admin/listLandlords';
+import { useState, type ReactNode } from 'react';
 import Button from '../../components/Button';
 import TextareaInput from '../../components/TextareaInput';
-import { formatDate } from '../../helpers';
-import type { useApproveLandlord } from './hooks/useApproveLandlord';
-import type { useRejectLandlord } from './hooks/useRejectLandlord';
-import WorkspaceDetails from './WorkspaceDetails';
 import styles from './Admin.module.scss';
 
-type WorkspaceRowProps = {
-  request: LandlordResponse;
-  workspace: LandlordWorkspaceSummary;
+type ApplicationRowProps = {
+  summary: ReactNode;
+  details: ReactNode;
   isExpanded: boolean;
   isDeciding: boolean;
-  rejectMutation: Pick<ReturnType<typeof useRejectLandlord>, 'mutate'>;
-  approveMutation: Pick<ReturnType<typeof useApproveLandlord>, 'mutate'>;
+  onApprove: () => void;
+  onReject: (reason?: string) => void;
   onToggle: () => void;
 };
 
-function WorkspaceRow({
-  request,
-  workspace,
+function ApplicationRow({
+  summary,
+  details,
   isExpanded,
   isDeciding,
-  rejectMutation,
-  approveMutation,
+  onApprove,
+  onReject,
   onToggle,
-}: WorkspaceRowProps) {
+}: ApplicationRowProps) {
   const [isRejectOpen, setIsRejectOpen] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
+
+  const closeReject = () => {
+    setIsRejectOpen(false);
+    setRejectReason('');
+  };
 
   return (
     <li>
@@ -48,10 +45,7 @@ function WorkspaceRow({
           }
         }}
       >
-        <span className={styles.summary}>
-          {request.realName} — {workspace.name} —{' '}
-          {formatDate(workspace.createdAt)}
-        </span>
+        <span className={styles.summary}>{summary}</span>
         <div
           className={styles.actions}
           onClick={(event) => event.stopPropagation()}
@@ -69,7 +63,7 @@ function WorkspaceRow({
               <Button
                 type="button"
                 disabled={isDeciding}
-                onClick={() => approveMutation.mutate(request.userId)}
+                onClick={onApprove}
                 cta
               >
                 Одобрить
@@ -83,10 +77,13 @@ function WorkspaceRow({
                 event.preventDefault();
                 const reason = rejectReason.trim();
 
-                rejectMutation.mutate({
-                  userId: request.userId,
-                  ...(reason ? { reason } : {}),
-                });
+                onReject(reason || undefined);
+              }}
+              onKeyDown={(event) => {
+                if (event.key === 'Escape') {
+                  event.preventDefault();
+                  closeReject();
+                }
               }}
             >
               <TextareaInput
@@ -99,10 +96,7 @@ function WorkspaceRow({
                 <Button
                   type="button"
                   disabled={isDeciding}
-                  onClick={() => {
-                    setIsRejectOpen(false);
-                    setRejectReason('');
-                  }}
+                  onClick={closeReject}
                 >
                   Отмена
                 </Button>
@@ -114,11 +108,9 @@ function WorkspaceRow({
           )}
         </div>
       </div>
-      {isExpanded && (
-        <WorkspaceDetails request={request} workspace={workspace} />
-      )}
+      {isExpanded && details}
     </li>
   );
 }
 
-export default WorkspaceRow;
+export default ApplicationRow;
