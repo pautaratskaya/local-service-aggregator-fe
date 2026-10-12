@@ -9,7 +9,7 @@ import { useLandlordPremises } from '../../hooks/useLandlordPremises';
 import DeleteDialog from './DeleteDialog';
 import { findPremise } from './findPremise';
 import { useDeletePremise } from './hooks/useDeletePremise';
-import PhotoViewer from './PhotoViewer';
+import PhotoViewer from '../../components/PhotoViewer';
 import WorkspaceCard from './WorkspaceCard';
 import styles from './Premises.module.scss';
 
@@ -190,7 +190,7 @@ function PremisePage() {
       </div>
       {photoIndex != null && (
         <PhotoViewer
-          photos={photos}
+          photos={photos.map((photo) => ({ src: photo.url }))}
           index={photoIndex}
           onClose={() => setPhotoIndex(null)}
           onIndex={setPhotoIndex}

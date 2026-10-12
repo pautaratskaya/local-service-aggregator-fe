@@ -20,7 +20,6 @@ function EditWorkspace() {
         <p>Рабочее место не найдено</p>
       ) : (
         <WorkspaceForm
-          description="Фото можно удалить или добавить новые. Должно остаться от 1 до 10. Услуги заменятся выбранными."
           submitLabel="Сохранить"
           initialWorkspace={found.workspace}
           isPending={updateWorkspace.isPending}

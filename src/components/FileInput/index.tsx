@@ -1,5 +1,12 @@
-import { type InputHTMLAttributes, useEffect, useId, useMemo } from 'react';
+import {
+  type InputHTMLAttributes,
+  useEffect,
+  useId,
+  useMemo,
+  useState,
+} from 'react';
 import { CrossIcon } from '../../icons';
+import PhotoViewer from '../PhotoViewer';
 import styles from './FileInput.module.scss';
 
 type FileInputProps = Omit<
@@ -23,6 +30,7 @@ function FileInput({
   ...inputProps
 }: FileInputProps) {
   const inputId = useId();
+  const [photoIndex, setPhotoIndex] = useState<number | null>(null);
   const titleText = error || label;
   const pickButtonText = files.length > 0 ? 'Добавить фото' : 'Выбрать фото';
 
@@ -32,7 +40,7 @@ function FileInput({
         file,
         url: URL.createObjectURL(file),
       })),
-    [files]
+    [files],
   );
 
   useEffect(() => {
@@ -77,7 +85,14 @@ function FileInput({
               key={`${file.name}-${file.lastModified}-${file.size}-${index}`}
               className={styles.previewItem}
             >
-              <img src={url} alt={file.name} className={styles.previewImage} />
+              <button
+                type="button"
+                className={styles.previewImage}
+                aria-label={`Открыть ${file.name}`}
+                onClick={() => setPhotoIndex(index)}
+              >
+                <img src={url} alt="" />
+              </button>
               {onFileRemove && (
                 <button
                   type="button"
@@ -94,6 +109,14 @@ function FileInput({
       )}
       {files.length > 0 && (
         <p className={styles.meta}>Загружено: {files.length}</p>
+      )}
+      {photoIndex != null && (
+        <PhotoViewer
+          photos={previewItems.map((item) => ({ src: item.url }))}
+          index={photoIndex}
+          onClose={() => setPhotoIndex(null)}
+          onIndex={setPhotoIndex}
+        />
       )}
     </div>
   );

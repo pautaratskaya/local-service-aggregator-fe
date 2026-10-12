@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import type { LandlordResponse, Premise } from '../../api/admin/listLandlords';
+import PhotoViewer from '../../components/PhotoViewer';
 import { formatDateTime, formatOptional } from '../../helpers';
 import { formatPremiseStatus } from './formatApplication';
 import styles from './Admin.module.scss';
@@ -9,6 +11,8 @@ type PremiseDetailsProps = {
 };
 
 function PremiseDetails({ request, premise }: PremiseDetailsProps) {
+  const [photoIndex, setPhotoIndex] = useState<number | null>(null);
+  const photos = [...premise.photos].sort((a, b) => a.order - b.order);
   return (
     <dl className={styles.details}>
       <div>
@@ -64,14 +68,26 @@ function PremiseDetails({ request, premise }: PremiseDetailsProps) {
           <dt>Фото</dt>
           <dd>
             <ul className={styles.photos}>
-              {[...premise.photos]
-                .sort((a, b) => a.order - b.order)
-                .map((photo) => (
-                  <li key={photo.id}>
+              {photos.map((photo, index) => (
+                <li key={photo.id}>
+                  <button
+                    type="button"
+                    aria-label={`Открыть фото ${index + 1}`}
+                    onClick={() => setPhotoIndex(index)}
+                  >
                     <img src={photo.url} alt="" />
-                  </li>
-                ))}
+                  </button>
+                </li>
+              ))}
             </ul>
+            {photoIndex != null && (
+              <PhotoViewer
+                photos={photos.map((photo) => ({ src: photo.url }))}
+                index={photoIndex}
+                onClose={() => setPhotoIndex(null)}
+                onIndex={setPhotoIndex}
+              />
+            )}
           </dd>
         </div>
       )}

@@ -257,11 +257,19 @@
       padding: 0;
       list-style: none;
 
-      img {
-        width: 120px;
-        height: 90px;
-        object-fit: cover;
-        border-radius: 8px;
+      button {
+        padding: 0;
+        border: none;
+        background: none;
+        cursor: pointer;
+
+        img {
+          display: block;
+          width: 120px;
+          height: 90px;
+          object-fit: cover;
+          border-radius: 8px;
+        }
       }
     }
 

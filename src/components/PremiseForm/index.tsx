@@ -21,7 +21,7 @@ import styles from './PremiseForm.module.scss';
 type Errors = Partial<Record<string, string>>;
 
 type PremiseFormProps = {
-  description: string;
+  description?: string;
   notice?: string;
   submitLabel: string;
   pendingLabel?: string;
@@ -211,7 +211,7 @@ function PremiseForm({
       }}
     >
       <div className={styles.content}>
-        <p className={styles.description}>{description}</p>
+        {description && <p className={styles.description}>{description}</p>}
         {notice && <p className={styles.error}>{notice}</p>}
         <TextInput
           label="Название помещения"

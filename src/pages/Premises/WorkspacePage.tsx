@@ -8,6 +8,7 @@ import { useLandlordPremises } from '../../hooks/useLandlordPremises';
 import DeleteDialog from './DeleteDialog';
 import { findWorkspace } from './findPremise';
 import { useDeleteWorkspace } from './hooks/useDeleteWorkspace';
+import PhotoViewer from '../../components/PhotoViewer';
 import styles from './Premises.module.scss';
 
 function WorkspacePage() {
@@ -17,6 +18,7 @@ function WorkspacePage() {
   const premisesQuery = useLandlordPremises(true);
   const deleteWorkspace = useDeleteWorkspace();
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [photoIndex, setPhotoIndex] = useState<number | null>(null);
   const found = findWorkspace(premisesQuery.data, workspaceId);
 
   const closeDelete = () => {
@@ -93,6 +95,26 @@ function WorkspacePage() {
           </Button>
         </div>
       </div>
+      {photos.length > 0 && (
+        <ul
+          className={`${styles.gallery} ${photos.length === 1 ? styles.solo : ''}`}
+        >
+          {photos.map((photo, index) => (
+            <li
+              key={photo.id}
+              className={index === 0 ? styles.hero : undefined}
+            >
+              <button
+                type="button"
+                aria-label={`Открыть фото ${index + 1}`}
+                onClick={() => setPhotoIndex(index)}
+              >
+                <img src={photo.url} alt="" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
       <dl className={styles.details}>
         <div>
           <dt>Тип</dt>
@@ -110,21 +132,15 @@ function WorkspacePage() {
           <dt>Минимальное время аренды</dt>
           <dd>{workspace.minRentMinutes} мин</dd>
         </div>
-        {photos.length > 0 && (
-          <div>
-            <dt>Фото</dt>
-            <dd>
-              <ul className={styles.photos}>
-                {photos.map((photo) => (
-                  <li key={photo.id}>
-                    <img src={photo.url} alt="" />
-                  </li>
-                ))}
-              </ul>
-            </dd>
-          </div>
-        )}
       </dl>
+      {photoIndex != null && (
+        <PhotoViewer
+          photos={photos.map((photo) => ({ src: photo.url }))}
+          index={photoIndex}
+          onClose={() => setPhotoIndex(null)}
+          onIndex={setPhotoIndex}
+        />
+      )}
       {deleteOpen && (
         <DeleteDialog
           title={`Удалить «${workspace.kind}»?`}

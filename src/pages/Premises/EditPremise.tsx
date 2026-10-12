@@ -20,7 +20,7 @@ function EditPremise() {
         <p>Помещение не найдено</p>
       ) : (
         <PremiseForm
-          description="Измените данные помещения. Фото можно удалить или добавить новые. Должно остаться от 3 до 15."
+          description="Измените данные помещения."
           submitLabel="Сохранить"
           showTerms={false}
           initialPremise={premise}

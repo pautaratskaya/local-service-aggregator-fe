@@ -8,7 +8,7 @@ function AddPremise() {
   return (
     <Modal title="Добавить помещение">
       <PremiseForm
-        description="Заполните данные нового помещения"
+        description="Заполните данные нового помещения."
         submitLabel="Добавить помещение"
         showTerms={false}
         isPending={addPremise.isPending}

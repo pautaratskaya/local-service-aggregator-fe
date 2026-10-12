@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import type { MasterRequestResponse } from '../../api/admin/listMasters';
+import PhotoViewer from '../../components/PhotoViewer';
 import { formatOptional } from '../../helpers';
 import styles from './Admin.module.scss';
 
@@ -8,6 +10,7 @@ type MasterDetailsProps = {
 
 function MasterDetails({ request }: MasterDetailsProps) {
   const { master } = request;
+  const [photoOpen, setPhotoOpen] = useState(false);
 
   return (
     <dl className={styles.details}>
@@ -41,9 +44,23 @@ function MasterDetails({ request }: MasterDetailsProps) {
           <dd>
             <ul className={styles.photos}>
               <li>
-                <img src={master.photoUrl} alt="" />
+                <button
+                  type="button"
+                  aria-label="Открыть фото"
+                  onClick={() => setPhotoOpen(true)}
+                >
+                  <img src={master.photoUrl} alt="" />
+                </button>
               </li>
             </ul>
+            {photoOpen && (
+              <PhotoViewer
+                photos={[{ src: master.photoUrl }]}
+                index={0}
+                onClose={() => setPhotoOpen(false)}
+                onIndex={() => undefined}
+              />
+            )}
           </dd>
         </div>
       )}
