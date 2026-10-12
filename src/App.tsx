@@ -35,6 +35,7 @@ import {
   isUnauthorizedUserError,
   useCurrentUser,
 } from './hooks/useCurrentUser';
+import { useSyncSelectedRole } from './hooks/useSyncSelectedRole';
 import { useAuthHydrated, useAuthStore } from './stores/authStore';
 import './App.scss';
 
@@ -151,6 +152,7 @@ function AppRoutes() {
     error: userError,
     refetch: refetchUser,
   } = useCurrentUser();
+  useSyncSelectedRole(user);
   const userIsMissing = isMissingUserError(userError);
   const authHydrated = useAuthHydrated();
   const sessionIsInvalid =
