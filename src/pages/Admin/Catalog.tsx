@@ -9,7 +9,7 @@ import CatalogDeleteDialog, {
 } from './CatalogDeleteDialog';
 import CatalogRow from './CatalogRow';
 import ServiceGroupForm from './ServiceGroupForm';
-import { useCatalogTree } from './hooks/useCatalogTree';
+import { useCatalogTree } from '../../hooks/useCatalogTree';
 import { useCreateServiceGroup } from './hooks/useCreateServiceGroup';
 import { useDeleteServiceGroup } from './hooks/useDeleteServiceGroup';
 import styles from './Admin.module.scss';

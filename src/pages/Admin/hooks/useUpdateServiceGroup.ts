@@ -4,7 +4,7 @@ import type { AdminServiceGroupPayload } from '../../../api/admin/serviceGroup';
 import type { CatalogGroup } from '../../../api/catalog/getCatalogTree';
 import { useToast } from '../../../components/Toast/toastContext';
 import { useAuthStore } from '../../../stores/authStore';
-import { catalogTreeQueryKey } from './useCatalogTree';
+import { catalogTreeQueryKey } from '../../../hooks/useCatalogTree';
 import { serviceGroupQueryKey } from './useGetServiceGroup';
 
 export type UpdateServiceGroupVariables = {

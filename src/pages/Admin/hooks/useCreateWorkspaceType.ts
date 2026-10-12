@@ -4,7 +4,7 @@ import type { AdminWorkspaceTypePayload } from '../../../api/admin/workspaceType
 import type { CatalogGroup } from '../../../api/catalog/getCatalogTree';
 import { useToast } from '../../../components/Toast/toastContext';
 import { useAuthStore } from '../../../stores/authStore';
-import { catalogTreeQueryKey } from './useCatalogTree';
+import { catalogTreeQueryKey } from '../../../hooks/useCatalogTree';
 import { workspaceTypeQueryKey } from './useGetWorkspaceType';
 
 export type CreateWorkspaceTypeVariables = {
@@ -39,7 +39,6 @@ export function useCreateWorkspaceType() {
                     id: created.id,
                     name: created.name,
                     description: created.description,
-                    shared: created.shared,
                     services: [],
                   },
                 ],

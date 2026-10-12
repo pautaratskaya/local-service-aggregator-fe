@@ -77,13 +77,13 @@ function Profile() {
             secondaryLabel={
               !landlordUnread &&
               user.landlordRoleStatus === ROLE_APPLICATION_STATUSES.APPROVED
-                ? 'Перейти к моим рабочим местам'
+                ? 'Перейти к моим помещениям'
                 : undefined
             }
             onSecondary={
               !landlordUnread &&
               user.landlordRoleStatus === ROLE_APPLICATION_STATUSES.APPROVED
-                ? () => navigate('/workspaces')
+                ? () => navigate('/premises')
                 : undefined
             }
           />

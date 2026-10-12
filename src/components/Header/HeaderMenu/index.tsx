@@ -81,10 +81,10 @@ function HeaderMenu({ user }: HeaderMenuProps) {
                 <li>
                   <Link
                     className={styles.menuItem}
-                    to="/workspaces"
+                    to="/premises"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Мои рабочие места
+                    Мои помещения
                   </Link>
                 </li>
               )}

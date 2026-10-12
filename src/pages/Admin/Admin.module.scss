@@ -264,6 +264,16 @@
         border-radius: 8px;
       }
     }
+
+    .workspaceList {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+
+      li + li {
+        margin-top: 4px;
+      }
+    }
   }
 }
 

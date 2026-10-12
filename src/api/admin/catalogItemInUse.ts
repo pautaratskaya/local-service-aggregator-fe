@@ -1,3 +1,5 @@
+import { ruCount } from '../../helpers';
+
 export const CATALOG_ITEM_IN_USE = 'CATALOG_ITEM_IN_USE';
 
 export type CatalogItemInUseDetails = {
@@ -91,12 +93,6 @@ function isCatalogItemInUseBody(
     typeof record.details.masters === 'number' &&
     typeof record.details.bookings === 'number'
   );
-}
-
-function ruCount(n: number, one: string, other: string): string {
-  const word = n % 10 === 1 && n % 100 !== 11 ? one : other;
-
-  return `${n} ${word}`;
 }
 
 function joinRu(parts: string[]): string {

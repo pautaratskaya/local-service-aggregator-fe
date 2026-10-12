@@ -11,7 +11,6 @@ export interface CatalogWorkspaceType {
   id: number;
   name: string;
   description: string;
-  shared: boolean;
   services: CatalogService[];
 }
 

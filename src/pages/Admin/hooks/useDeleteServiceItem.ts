@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminService } from '../../../api/admin/adminService';
 import { useToast } from '../../../components/Toast/toastContext';
 import { useAuthStore } from '../../../stores/authStore';
-import { catalogTreeQueryKey } from './useCatalogTree';
+import { catalogTreeQueryKey } from '../../../hooks/useCatalogTree';
 import { serviceItemQueryKey } from './useGetServiceItem';
 
 export function useDeleteServiceItem() {

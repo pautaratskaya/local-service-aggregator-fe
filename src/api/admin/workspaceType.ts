@@ -5,13 +5,11 @@ export interface AdminWorkspaceType {
   groupId: number;
   name: string;
   description: string;
-  shared: boolean;
 }
 
 export interface AdminWorkspaceTypePayload {
   name: string;
   description: string;
-  shared: boolean;
 }
 
 export async function getWorkspaceType(

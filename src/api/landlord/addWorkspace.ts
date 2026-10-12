@@ -1,76 +1,34 @@
-import type {
-  LandlordApplication,
-  SubmitLandlordApplicationPayload,
-} from '../../types/landlord';
-import { API_BASE_URL } from '../config';
+import type { Workspace } from '../admin/listLandlords';
 import {
+  WORKSPACE_PHOTO_CONFIG,
+  type WorkspaceFormPayload,
   buildWorkspaceFormData,
-  validateWorkspacePhotos,
-} from './submitApplication';
-import { LANDLORD_ERROR_TYPES, LandlordError } from './types';
+  validatePhotos,
+} from './formData';
+import { LANDLORD_CONFLICT_FALLBACKS, landlordRequest } from './request';
 
 export interface AddWorkspaceRequest {
   token: string;
-  payload: SubmitLandlordApplicationPayload;
+  premiseId: number;
+  payload: WorkspaceFormPayload & { photos: File[] };
 }
 
 export async function addWorkspace({
   token,
+  premiseId,
   payload,
-}: AddWorkspaceRequest): Promise<LandlordApplication> {
-  validateWorkspacePhotos(payload);
+}: AddWorkspaceRequest): Promise<Workspace> {
+  validatePhotos(payload.photos, WORKSPACE_PHOTO_CONFIG, true);
 
-  try {
-    const response = await fetch(`${API_BASE_URL}/landlord/add-workspace`, {
+  const response = await landlordRequest(
+    `/landlord/premises/${premiseId}/workspaces`,
+    token,
+    {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
       body: buildWorkspaceFormData(payload),
-    });
+    },
+    { conflictFallback: LANDLORD_CONFLICT_FALLBACKS.WORKSPACE },
+  );
 
-    if (!response.ok) {
-      if (response.status === 401) {
-        throw new LandlordError(
-          'Требуется авторизация',
-          response.status,
-          LANDLORD_ERROR_TYPES.UNKNOWN,
-        );
-      }
-
-      if (response.status === 403) {
-        throw new LandlordError(
-          'Добавлять рабочие места может только подтверждённый арендодатель',
-          response.status,
-          LANDLORD_ERROR_TYPES.UNKNOWN,
-        );
-      }
-
-      if (response.status === 400) {
-        throw new LandlordError(
-          'Проверьте корректность данных формы',
-          response.status,
-          LANDLORD_ERROR_TYPES.INVALID_PAYLOAD,
-        );
-      }
-
-      throw new LandlordError(
-        `Ошибка сервера: ${response.status}`,
-        response.status,
-        LANDLORD_ERROR_TYPES.UNKNOWN,
-      );
-    }
-
-    return response.json() as Promise<LandlordApplication>;
-  } catch (error) {
-    if (error instanceof LandlordError) {
-      throw error;
-    }
-
-    throw new LandlordError(
-      'Не удалось подключиться к серверу',
-      0,
-      LANDLORD_ERROR_TYPES.NETWORK,
-    );
-  }
+  return response.json() as Promise<Workspace>;
 }

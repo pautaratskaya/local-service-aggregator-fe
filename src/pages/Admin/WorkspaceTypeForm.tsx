@@ -35,7 +35,7 @@ function WorkspaceTypeForm({ id, onClose }: WorkspaceTypeFormProps) {
         updateWorkspaceType.mutate(
           {
             id,
-            payload: { ...payload, shared: data.shared },
+            payload,
           },
           { onSuccess: onClose },
         );

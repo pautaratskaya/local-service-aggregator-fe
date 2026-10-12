@@ -1,73 +1,53 @@
 import { useLayoutEffect, useMemo, useState } from 'react';
-import { useWorkspaceTypes } from '../../hooks/useWorkspaceTypes';
-import type { LandlordWorkspaceSummary } from '../../api/admin/listLandlords';
-import { LANDLORD_PHOTO_CONFIG } from '../../api/landlord/submitApplication';
+import type { Premise } from '../../api/admin/listLandlords';
+import { LANDLORD_PHOTO_CONFIG } from '../../api/landlord/formData';
+import {
+  applyRejectedPremise,
+  premisePhotoToFile,
+} from '../../pages/BecomeLandlord/rejectedPremise';
+import type {
+  LandlordLegalInfo,
+  SubmitLandlordApplicationPayload,
+} from '../../types/landlord';
 import Button from '../Button';
-import PageLoader from '../PageLoader';
 import CheckboxInput from '../CheckboxInput';
 import FileInput from '../FileInput';
 import LegalInfoInput from '../LegalInfoInput';
-import SelectInput from '../SelectInput';
+import PageLoader from '../PageLoader';
 import TextareaInput from '../TextareaInput';
 import TextInput from '../TextInput';
-import WorkingHoursInput, { DEFAULT_WORKING_DAYS } from '../WorkingHoursInput';
-import {
-  applyRejectedWorkspace,
-  workspacePhotoToFile,
-} from '../../pages/BecomeLandlord/rejectedWorkspace';
-import {
-  MIN_RENTAL_DURATIONS,
-  toWeekdayApiValue,
-  type LandlordLegalInfo,
-  type MinRentalDurationMinutes,
-  type SubmitLandlordApplicationPayload,
-} from '../../types/landlord';
-import styles from './WorkspaceForm.module.scss';
-
-const MIN_RENTAL_OPTIONS = [
-  { value: String(MIN_RENTAL_DURATIONS.MINUTES_30), label: '30 мин' },
-  { value: String(MIN_RENTAL_DURATIONS.MINUTES_60), label: '1 час' },
-  { value: String(MIN_RENTAL_DURATIONS.MINUTES_120), label: '2 часа' },
-];
+import styles from './PremiseForm.module.scss';
 
 type Errors = Partial<Record<string, string>>;
 
-type WorkspaceFormProps = {
+type PremiseFormProps = {
   description: string;
   notice?: string;
   submitLabel: string;
   pendingLabel?: string;
   isPending: boolean;
   submitError?: unknown;
-  initialWorkspace?: LandlordWorkspaceSummary | null;
+  initialPremise?: Premise | null;
+  showTerms?: boolean;
   onSubmit: (payload: SubmitLandlordApplicationPayload) => void;
 };
 
-function WorkspaceForm({
+function PremiseForm({
   description,
   notice,
   submitLabel,
   pendingLabel = 'Отправляем...',
   isPending,
   submitError,
-  initialWorkspace,
+  initialPremise,
+  showTerms = true,
   onSubmit,
-}: WorkspaceFormProps) {
-  const { data: workspaceTypes = [], isError: workspaceTypesError } =
-    useWorkspaceTypes();
-  const initialWorkspaceId = initialWorkspace?.id;
+}: PremiseFormProps) {
+  const initialPremiseId = initialPremise?.id;
   const [placeName, setPlaceName] = useState('');
   const [city, setCity] = useState('');
   const [address, setAddress] = useState('');
-  const [placeType, setPlaceType] = useState('');
   const [descriptionText, setDescriptionText] = useState('');
-  const [workFrom, setWorkFrom] = useState('09:00');
-  const [workTo, setWorkTo] = useState('21:00');
-  const [workingDays, setWorkingDays] =
-    useState<string[]>(DEFAULT_WORKING_DAYS);
-  const [minRentalDurationMinutes, setMinRentalDurationMinutes] =
-    useState<MinRentalDurationMinutes>(MIN_RENTAL_DURATIONS.MINUTES_60);
-  const [pricePerHour, setPricePerHour] = useState('');
   const [photos, setPhotos] = useState<File[]>([]);
   const [photosLoading, setPhotosLoading] = useState(false);
   const [photosSettled, setPhotosSettled] = useState(false);
@@ -78,29 +58,23 @@ function WorkspaceForm({
   const [errors, setErrors] = useState<Errors>({});
 
   useLayoutEffect(() => {
-    if (!initialWorkspace) {
+    if (!initialPremise) {
       return;
     }
 
-    applyRejectedWorkspace(initialWorkspace, {
+    applyRejectedPremise(initialPremise, {
       setPlaceName,
       setCity,
       setAddress,
-      setPlaceType,
       setDescription: setDescriptionText,
-      setWorkFrom,
-      setWorkTo,
-      setWorkingDays,
-      setMinRentalDurationMinutes,
-      setPricePerHour,
       setCompanyName,
       setRegistrationNumber,
       setBankDetails,
     });
 
     let cancelled = false;
-    const photosToLoad = [...initialWorkspace.photos].sort(
-      (a, b) => a.order - b.order
+    const photosToLoad = [...initialPremise.photos].sort(
+      (a, b) => a.order - b.order,
     );
 
     if (photosToLoad.length === 0) {
@@ -109,7 +83,7 @@ function WorkspaceForm({
     }
 
     setPhotosLoading(true);
-    void Promise.all(photosToLoad.map((photo) => workspacePhotoToFile(photo)))
+    void Promise.all(photosToLoad.map((photo) => premisePhotoToFile(photo)))
       .then((files) => {
         if (!cancelled) {
           setPhotos(files);
@@ -133,9 +107,9 @@ function WorkspaceForm({
     return () => {
       cancelled = true;
     };
-    // Refetching the same workspace must not cancel the photo download.
+    // Refetching the same premise must not cancel the photo download.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialWorkspaceId]);
+  }, [initialPremiseId]);
 
   const legalInfo: LandlordLegalInfo | null = useMemo(() => {
     if (!companyName && !registrationNumber && !bankDetails) {
@@ -152,20 +126,13 @@ function WorkspaceForm({
   const validateForm = () => {
     const nextErrors: Errors = {};
 
-    if (!placeName.trim())
-      nextErrors.placeName = 'Введите название рабочего места';
+    if (!placeName.trim()) {
+      nextErrors.placeName = 'Введите название помещения';
+    }
     if (!city.trim()) nextErrors.city = 'Введите город';
     if (!address.trim()) nextErrors.address = 'Введите адрес';
-    if (!placeType) nextErrors.placeType = 'Выберите тип рабочего места';
-    if (!descriptionText.trim()) nextErrors.description = 'Добавьте описание';
     if (descriptionText.trim().length > 1000) {
       nextErrors.description = 'Описание должно быть до 1000 символов';
-    }
-    if (workingDays.length === 0) {
-      nextErrors.workingHours = 'Выберите хотя бы один рабочий день';
-    } else if (!workFrom || !workTo || workFrom >= workTo) {
-      nextErrors.workingHours =
-        'Проверьте время работы: начало должно быть раньше окончания';
     }
     if (photos.length < LANDLORD_PHOTO_CONFIG.MIN_COUNT) {
       nextErrors.photos = 'Нужно минимум 3 фотографии';
@@ -177,8 +144,8 @@ function WorkspaceForm({
       photos.some(
         (photo) =>
           !LANDLORD_PHOTO_CONFIG.ALLOWED_MIME_TYPES.includes(
-            photo.type as never
-          )
+            photo.type as never,
+          ),
       )
     ) {
       nextErrors.photos =
@@ -186,18 +153,15 @@ function WorkspaceForm({
     }
     if (
       photos.some(
-        (photo) => photo.size > LANDLORD_PHOTO_CONFIG.MAX_FILE_SIZE_BYTES
+        (photo) => photo.size > LANDLORD_PHOTO_CONFIG.MAX_FILE_SIZE_BYTES,
       )
     ) {
       nextErrors.photos = 'Размер каждого файла должен быть не больше 10 МБ';
     }
-    if (!pricePerHour || Number(pricePerHour) <= 0) {
-      nextErrors.pricePerHour = 'Введите корректную цену за час';
-    }
     if (legalInfo && !legalInfo.companyName) {
       nextErrors.legalInfo = 'Укажите название юридического лица или ИП';
     }
-    if (!termsAccepted) {
+    if (showTerms && !termsAccepted) {
       nextErrors.termsAccepted =
         'Подтвердите согласие с условиями для арендодателей';
     }
@@ -215,14 +179,6 @@ function WorkspaceForm({
     setPhotos((prev) => prev.filter((_, photoIndex) => photoIndex !== index));
   };
 
-  const onWorkingDayToggle = (day: string) => {
-    setWorkingDays((prev) =>
-      prev.includes(day)
-        ? prev.filter((value) => value !== day)
-        : [...prev, day]
-    );
-  };
-
   const handleSubmit = () => {
     if (!validateForm()) {
       return;
@@ -232,38 +188,37 @@ function WorkspaceForm({
       placeName: placeName.trim(),
       city: city.trim(),
       address: address.trim(),
-      workspaceTypeId: Number(placeType),
       description: descriptionText.trim(),
-      workingHours: {
-        from: workFrom,
-        to: workTo,
-      },
-      workingDays: workingDays.map((day) => toWeekdayApiValue(day)),
-      minRentalDurationMinutes,
-      pricePerHour: Number(pricePerHour),
       legalInfo,
       photos,
+      termsAccepted,
     });
   };
 
   const waitingForInitialPhotos =
-    (initialWorkspace?.photos.length ?? 0) > 0 && !photosSettled;
+    (initialPremise?.photos.length ?? 0) > 0 && !photosSettled;
 
   if (waitingForInitialPhotos) {
     return <PageLoader />;
   }
 
   return (
-    <div className={styles.form}>
+    <form
+      className={styles.form}
+      onSubmit={(event) => {
+        event.preventDefault();
+        handleSubmit();
+      }}
+    >
       <div className={styles.content}>
         <p className={styles.description}>{description}</p>
         {notice && <p className={styles.error}>{notice}</p>}
         <TextInput
-          label="Название рабочего места"
+          label="Название помещения"
           required
           value={placeName}
           onChange={(e) => setPlaceName(e.target.value)}
-          placeholder="Например, Кабинет Beauty Spot"
+          placeholder="Например, Beauti Baza"
           autoFocus
           error={errors.placeName}
         />
@@ -284,71 +239,16 @@ function WorkspaceForm({
           placeholder="Введите адрес"
           error={errors.address}
         />
-        {/* TODO: add 'Другое' option */}
-        <SelectInput
-          label="Тип рабочего места"
-          required
-          value={placeType}
-          onChange={(e) => setPlaceType(e.target.value)}
-          aria-label="Тип рабочего места"
-          options={workspaceTypes.map((type) => ({
-            value: String(type.id),
-            label: type.workspaceName,
-          }))}
-          placeholder="Выберите тип"
-          error={
-            errors.placeType ??
-            (workspaceTypesError
-              ? 'Не удалось загрузить типы рабочих мест'
-              : undefined)
-          }
-        />
         <TextareaInput
-          label="Описание рабочего места"
-          required
+          label="Описание"
           value={descriptionText}
           onChange={(e) => setDescriptionText(e.target.value)}
           maxLength={1000}
-          placeholder="Опишите особенности и оборудование"
+          placeholder="Опишите помещение"
           error={errors.description}
         />
-        <WorkingHoursInput
-          label="Время работы рабочего места"
-          required
-          workFrom={workFrom}
-          workTo={workTo}
-          workingDays={workingDays}
-          onWorkFromChange={setWorkFrom}
-          onWorkToChange={setWorkTo}
-          onWorkingDayToggle={onWorkingDayToggle}
-          error={errors.workingHours}
-        />
-        <SelectInput
-          label="Минимальное время аренды"
-          required
-          value={String(minRentalDurationMinutes)}
-          onChange={(e) =>
-            setMinRentalDurationMinutes(
-              Number(e.target.value) as MinRentalDurationMinutes
-            )
-          }
-          aria-label="Минимальное время аренды"
-          options={MIN_RENTAL_OPTIONS}
-        />
-        {/*  TODO: add currency selector */}
-        <TextInput
-          label="Цена за час"
-          required
-          type="number"
-          min={1}
-          step={1}
-          value={pricePerHour}
-          onChange={(e) => setPricePerHour(e.target.value)}
-          placeholder="Например, 30"
-          error={errors.pricePerHour}
-        />
         <FileInput
-          label="Фотографии рабочего места (3-15 шт.)"
+          label="Фотографии помещения (3-15 шт.)"
           required
           accept=".jpg,.jpeg,.png,.webp"
           multiple
@@ -366,16 +266,24 @@ function WorkspaceForm({
           onBankDetailsChange={setBankDetails}
           error={errors.legalInfo}
         />
-        <CheckboxInput
-          label="Я принимаю условия использования платформы для арендодателей"
-          required
-          checked={termsAccepted}
-          onChange={setTermsAccepted}
-          error={errors.termsAccepted}
-        />
-        <a href="#" onClick={(e) => e.preventDefault()} className={styles.link}>
-          Открыть условия использования
-        </a>
+        {showTerms && (
+          <>
+            <CheckboxInput
+              label="Я принимаю условия использования платформы для арендодателей"
+              required
+              checked={termsAccepted}
+              onChange={setTermsAccepted}
+              error={errors.termsAccepted}
+            />
+            <a
+              href="#"
+              onClick={(e) => e.preventDefault()}
+              className={styles.link}
+            >
+              Открыть условия использования
+            </a>
+          </>
+        )}
         {submitError != null && (
           <p className={styles.error}>
             {submitError instanceof Error
@@ -385,16 +293,12 @@ function WorkspaceForm({
         )}
       </div>
       <footer>
-        <Button
-          onClick={handleSubmit}
-          cta
-          disabled={isPending || photosLoading}
-        >
+        <Button type="submit" cta disabled={isPending || photosLoading}>
           {isPending ? pendingLabel : submitLabel}
         </Button>
       </footer>
-    </div>
+    </form>
   );
 }
 
-export default WorkspaceForm;
+export default PremiseForm;

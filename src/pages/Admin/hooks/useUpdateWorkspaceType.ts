@@ -4,7 +4,7 @@ import type { AdminWorkspaceTypePayload } from '../../../api/admin/workspaceType
 import type { CatalogGroup } from '../../../api/catalog/getCatalogTree';
 import { useToast } from '../../../components/Toast/toastContext';
 import { useAuthStore } from '../../../stores/authStore';
-import { catalogTreeQueryKey } from './useCatalogTree';
+import { catalogTreeQueryKey } from '../../../hooks/useCatalogTree';
 import { workspaceTypeQueryKey } from './useGetWorkspaceType';
 
 export type UpdateWorkspaceTypeVariables = {
@@ -36,7 +36,6 @@ export function useUpdateWorkspaceType() {
                   ...workspaceType,
                   name: updated.name,
                   description: updated.description,
-                  shared: updated.shared,
                 }
               : workspaceType,
           ),

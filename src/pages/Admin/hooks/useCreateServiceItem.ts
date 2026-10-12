@@ -3,7 +3,7 @@ import { adminService } from '../../../api/admin/adminService';
 import type { AdminServiceItemPayload } from '../../../api/admin/serviceItem';
 import { useToast } from '../../../components/Toast/toastContext';
 import { useAuthStore } from '../../../stores/authStore';
-import { catalogTreeQueryKey } from './useCatalogTree';
+import { catalogTreeQueryKey } from '../../../hooks/useCatalogTree';
 
 export type CreateServiceItemVariables = {
   workspaceTypeId: number;

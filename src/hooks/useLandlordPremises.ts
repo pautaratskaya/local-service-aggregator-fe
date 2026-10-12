@@ -1,20 +1,20 @@
 import { useQuery } from '@tanstack/react-query';
 import { landlordService } from '../api/landlord/landlordService';
 import { useAuthStore } from '../stores/authStore';
-import { landlordWorkspacesQueryKey } from './landlordWorkspacesQueryKey';
+import { landlordPremisesQueryKey } from './landlordPremisesQueryKey';
 
-export function useLandlordWorkspaces(enabled: boolean) {
+export function useLandlordPremises(enabled: boolean) {
   const token = useAuthStore((state) => state.token);
   const userId = useAuthStore((state) => state.userId);
 
   return useQuery({
-    queryKey: landlordWorkspacesQueryKey(userId),
+    queryKey: landlordPremisesQueryKey(userId),
     queryFn: () => {
       if (!token) {
         throw new Error('Требуется авторизация');
       }
 
-      return landlordService.listWorkspaces({ token });
+      return landlordService.listPremises({ token });
     },
     enabled: enabled && !!token,
     staleTime: 0,

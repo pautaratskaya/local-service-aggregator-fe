@@ -6,7 +6,7 @@ import ApplicationRow from './ApplicationRow';
 import { useApproveLandlord } from './hooks/useApproveLandlord';
 import { usePendingLandlords } from './hooks/usePendingLandlords';
 import { useRejectLandlord } from './hooks/useRejectLandlord';
-import WorkspaceDetails from './WorkspaceDetails';
+import PremiseDetails from './PremiseDetails';
 import styles from './Admin.module.scss';
 
 function LandlordApplications() {
@@ -41,7 +41,7 @@ function LandlordApplications() {
 
     if (
       !landlordsQuery.data ||
-      !landlordsQuery.data.some((request) => request.workspaces.length > 0)
+      !landlordsQuery.data.some((request) => request.premises.length > 0)
     ) {
       return <p className={styles.empty}>Заявок нет</p>;
     }
@@ -49,16 +49,14 @@ function LandlordApplications() {
     return (
       <ol className={styles.list}>
         {landlordsQuery.data.flatMap((request) =>
-          request.workspaces.map((workspace) => {
-            const itemKey = `${request.userId}-${workspace.id}`;
+          request.premises.map((premise) => {
+            const itemKey = `${request.userId}-${premise.id}`;
 
             return (
               <ApplicationRow
                 key={itemKey}
-                summary={`${request.realName} — ${workspace.name} — ${formatDate(workspace.createdAt)}`}
-                details={
-                  <WorkspaceDetails request={request} workspace={workspace} />
-                }
+                summary={`${request.realName} — ${premise.name} — ${formatDate(premise.createdAt)}`}
+                details={<PremiseDetails request={request} premise={premise} />}
                 isExpanded={expandedKey === itemKey}
                 isDeciding={
                   rejectLandlordMutation.isPending ||

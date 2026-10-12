@@ -1,32 +1,9 @@
-import { MIN_RENTAL_DURATIONS, WEEKDAYS } from '../../types/landlord';
-
-const DAY_ORDER = Object.keys(WEEKDAYS);
-
-const WORKSPACE_STATUS_LABELS: Record<string, string> = {
+const PREMISE_STATUS_LABELS: Record<string, string> = {
   UNDER_REVIEW: 'На проверке',
+  APPROVED: 'Одобрено',
+  REJECTED: 'Отклонено',
 };
 
-const MIN_RENT_LABELS: Record<number, string> = {
-  [MIN_RENTAL_DURATIONS.MINUTES_30]: '30 мин',
-  [MIN_RENTAL_DURATIONS.MINUTES_60]: '1 час',
-  [MIN_RENTAL_DURATIONS.MINUTES_120]: '2 часа',
-};
-
-export function formatTime(value: string) {
-  return value.slice(0, 5);
-}
-
-export function formatWorkingDays(days: string[]) {
-  return [...days]
-    .sort((a, b) => DAY_ORDER.indexOf(a) - DAY_ORDER.indexOf(b))
-    .map((day) => WEEKDAYS[day as keyof typeof WEEKDAYS] ?? day)
-    .join(', ');
-}
-
-export function formatMinRent(minutes: number) {
-  return MIN_RENT_LABELS[minutes] ?? `${minutes} мин`;
-}
-
-export function formatWorkspaceStatus(status: string) {
-  return WORKSPACE_STATUS_LABELS[status] ?? status;
+export function formatPremiseStatus(status: string) {
+  return PREMISE_STATUS_LABELS[status] ?? status;
 }

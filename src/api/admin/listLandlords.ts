@@ -1,37 +1,59 @@
 import { API_BASE_URL } from '../config';
 import type { RoleApplicationStatus } from '../../types/user';
 
-export interface LandlordWorkspacePhoto {
+export const PREMISE_STATUSES = {
+  UNDER_REVIEW: 'UNDER_REVIEW',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+} as const;
+
+export type PremiseStatus =
+  (typeof PREMISE_STATUSES)[keyof typeof PREMISE_STATUSES];
+
+export interface LandlordPhoto {
   id: number;
   url: string;
   order: number;
 }
 
-export interface LandlordWorkspaceSummary {
+export interface Workspace {
   id: number;
+  premisesId: number;
+  workspaceTypeId: number;
+  kind: string;
+  description: string | null;
+  minRentMinutes: number;
+  pricePerHour: number;
+  status: string;
+  photos: LandlordPhoto[];
+  serviceItemIds: number[];
+  createdAt: string;
+}
+
+export interface Premise {
+  id: number;
+  ownerId: number;
   name: string;
   city: string;
   address: string;
-  description: string;
-  openTime: string;
-  closeTime: string;
-  workingDays: string[];
-  minRentMinutes: number;
-  pricePerHour: number;
+  latitude: number | null;
+  longitude: number | null;
+  description: string | null;
   legalName: string | null;
   legalRegistrationNo: string | null;
   legalDetails: string | null;
-  status: string;
+  termsAcceptedAt: string | null;
+  status: PremiseStatus;
+  photos: LandlordPhoto[];
+  workspaces: Workspace[];
   createdAt: string;
-  photos: LandlordWorkspacePhoto[];
-  workspaceTypeId: number;
 }
 
 export interface LandlordResponse {
   userId: number;
   phone: string;
   realName: string;
-  workspaces: LandlordWorkspaceSummary[];
+  premises: Premise[];
 }
 
 export interface ListLandlordsRequest {
@@ -53,7 +75,7 @@ export async function listLandlords({
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
 
     if (!response.ok) {

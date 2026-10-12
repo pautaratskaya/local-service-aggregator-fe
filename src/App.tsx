@@ -17,8 +17,13 @@ import AdminApplications from './pages/Admin/Applications';
 import AdminCatalog from './pages/Admin/Catalog';
 import AdminCatalogGroup from './pages/Admin/CatalogGroup';
 import Profile from './pages/Profile';
-import Workspaces from './pages/Workspaces';
-import AddWorkspace from './pages/Workspaces/AddWorkspace';
+import Premises from './pages/Premises';
+import PremisePage from './pages/Premises/PremisePage';
+import WorkspacePage from './pages/Premises/WorkspacePage';
+import AddPremise from './pages/Premises/AddPremise';
+import AddWorkspace from './pages/Premises/AddWorkspace';
+import EditPremise from './pages/Premises/EditPremise';
+import EditWorkspace from './pages/Premises/EditWorkspace';
 import Header from './components/Header';
 import { ROLE_APPLICATION_STATUSES, USER_ROLES } from './types/user';
 import { ToastProvider } from './components/Toast';
@@ -35,6 +40,15 @@ import './App.scss';
 
 const MISSING_USER_MESSAGE = 'Пользователь не найден';
 const INVALID_SESSION_MESSAGE = 'Сессия истекла. Войдите снова';
+
+function isLandlordModal(pathname: string) {
+  return (
+    pathname === '/add-premise' ||
+    pathname.startsWith('/edit-premise/') ||
+    pathname.startsWith('/add-workspace/') ||
+    pathname.startsWith('/edit-workspace/')
+  );
+}
 
 function backgroundPath(
   state: {
@@ -90,18 +104,22 @@ function BecomeMasterRoute() {
   return <BecomeMaster />;
 }
 
-function WorkspacesRoute() {
+function PremisesRoute() {
   const { data: user, isLoading: isUserLoading } = useCurrentUser();
+  const selectedRole = useAuthStore((state) => state.selectedRole);
 
   if (isUserLoading) {
     return null;
   }
 
-  if (!user?.roles.includes(USER_ROLES.LANDLORD)) {
+  if (
+    selectedRole !== USER_ROLES.LANDLORD ||
+    !user?.roles.includes(USER_ROLES.LANDLORD)
+  ) {
     return <Navigate to="/" replace />;
   }
 
-  return <Workspaces />;
+  return <Outlet />;
 }
 
 function AdminRoute() {
@@ -224,8 +242,27 @@ function AppRoutes() {
             <Routes location={background || location}>
               <Route path="/" element={<Home />} />
               <Route path="/profile" element={<Profile />} />
-              <Route path="/workspaces" element={<WorkspacesRoute />} />
-              <Route path="/add-workspace" element={<WorkspacesRoute />} />
+              <Route element={<PremisesRoute />}>
+                <Route path="/premises" element={<Premises />} />
+                <Route path="/premises/:premiseId" element={<PremisePage />} />
+                <Route
+                  path="/premises/:premiseId/workspaces/:workspaceId"
+                  element={<WorkspacePage />}
+                />
+                <Route path="/add-premise" element={<Premises />} />
+                <Route
+                  path="/edit-premise/:premiseId"
+                  element={<PremisePage />}
+                />
+                <Route
+                  path="/add-workspace/:premiseId"
+                  element={<PremisePage />}
+                />
+                <Route
+                  path="/edit-workspace/:workspaceId"
+                  element={<WorkspacePage />}
+                />
+              </Route>
               <Route path="/login" element={<Home />} />
               <Route path="/become-landlord" element={<Home />} />
               <Route path="/become-master" element={<Home />} />
@@ -250,12 +287,21 @@ function AppRoutes() {
           location.pathname === '/login' ||
           location.pathname === '/become-landlord' ||
           location.pathname === '/become-master' ||
-          location.pathname === '/add-workspace') && (
+          isLandlordModal(location.pathname)) && (
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/become-landlord" element={<BecomeLandlordRoute />} />
             <Route path="/become-master" element={<BecomeMasterRoute />} />
-            <Route path="/add-workspace" element={<AddWorkspace />} />
+            <Route path="/add-premise" element={<AddPremise />} />
+            <Route path="/edit-premise/:premiseId" element={<EditPremise />} />
+            <Route
+              path="/add-workspace/:premiseId"
+              element={<AddWorkspace />}
+            />
+            <Route
+              path="/edit-workspace/:workspaceId"
+              element={<EditWorkspace />}
+            />
           </Routes>
         )
       )}
