@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useDialogLock } from '../../hooks/useDialogLock';
+import { CrossIcon } from '../../icons';
 import styles from './PhotoViewer.module.scss';
 
 function NavChevron({ direction }: { direction: 'left' | 'right' }) {
@@ -117,7 +118,7 @@ function PhotoViewer({ photos, index, onClose, onIndex }: PhotoViewerProps) {
             aria-label="Закрыть"
             onClick={onClose}
           >
-            ×
+            <CrossIcon />
           </button>
         </div>
         <div className={styles.viewerStage}>
