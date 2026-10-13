@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useState } from 'react';
 import {
   BrowserRouter,
   Routes,
@@ -144,6 +144,7 @@ function AppRoutes() {
   const logout = useAuthStore((state) => state.logout);
   const token = useAuthStore((state) => state.token);
   const userId = useAuthStore((state) => state.userId);
+  const sessionExpired = useAuthStore((state) => state.sessionExpired);
   const {
     data: user,
     isLoading: isUserLoading,
@@ -156,28 +157,31 @@ function AppRoutes() {
   const userIsMissing = isMissingUserError(userError);
   const authHydrated = useAuthHydrated();
   const sessionIsInvalid =
-    isUnauthorizedUserError(userError) || (userId != null && !token);
+    sessionExpired ||
+    isUnauthorizedUserError(userError) ||
+    (userId != null && !token);
   // Remember if the user was already logged in when /login opened.
   // Signing in on this screen must not redirect away from the success step.
-  const enteredLoginWhileAuthenticated = useRef<boolean | null>(null);
+  const [enteredLoginWhileAuthenticated, setEnteredLoginWhileAuthenticated] =
+    useState<boolean | null>(null);
+
+  if (authHydrated && !isUserLoading && !isUserError) {
+    const nextEnteredLogin =
+      location.pathname === '/login'
+        ? (enteredLoginWhileAuthenticated ?? !!user)
+        : null;
+
+    if (nextEnteredLogin !== enteredLoginWhileAuthenticated) {
+      setEnteredLoginWhileAuthenticated(nextEnteredLogin);
+    }
+  }
 
   if (!authHydrated) {
     return <PageLoader />;
   }
 
-  if (!isUserLoading && !isUserError) {
-    if (location.pathname === '/login') {
-      if (enteredLoginWhileAuthenticated.current === null) {
-        enteredLoginWhileAuthenticated.current = !!user;
-      }
-    } else {
-      enteredLoginWhileAuthenticated.current = null;
-    }
-  }
-
   const shouldLeaveLogin =
-    location.pathname === '/login' &&
-    enteredLoginWhileAuthenticated.current === true;
+    location.pathname === '/login' && enteredLoginWhileAuthenticated === true;
   const isPublicPath =
     location.pathname === '/' || location.pathname === '/login';
   const returnPath = `${location.pathname}${location.search}`;

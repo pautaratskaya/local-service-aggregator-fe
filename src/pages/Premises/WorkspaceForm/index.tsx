@@ -56,14 +56,13 @@ function WorkspaceForm({
     useState<MinRentalDurationMinutes>(MIN_RENTAL_DURATIONS.MINUTES_60);
   const [serviceItemIds, setServiceItemIds] = useState<number[]>([]);
   const [photos, setPhotos] = useState<File[]>([]);
-  const [photosSettled, setPhotosSettled] = useState(!initialWorkspace);
+  const [photosLoading, setPhotosLoading] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
+  const [appliedWorkspaceId, setAppliedWorkspaceId] = useState<number>();
 
-  useLayoutEffect(() => {
-    if (!initialWorkspace) {
-      return;
-    }
-
+  // Refetching the same workspace must not overwrite edits.
+  if (initialWorkspace && initialWorkspace.id !== appliedWorkspaceId) {
+    setAppliedWorkspaceId(initialWorkspace.id);
     setWorkspaceTypeId(String(initialWorkspace.workspaceTypeId));
     setDescriptionText(initialWorkspace.description ?? '');
     setPricePerHour(String(initialWorkspace.pricePerHour));
@@ -71,16 +70,18 @@ function WorkspaceForm({
       initialWorkspace.minRentMinutes as MinRentalDurationMinutes,
     );
     setServiceItemIds(initialWorkspace.serviceItemIds);
+    setPhotosLoading(initialWorkspace.photos.length > 0);
+  }
+
+  useLayoutEffect(() => {
+    if (!initialWorkspace || initialWorkspace.photos.length === 0) {
+      return;
+    }
 
     let cancelled = false;
     const photosToLoad = [...initialWorkspace.photos].sort(
       (a, b) => a.order - b.order,
     );
-
-    if (photosToLoad.length === 0) {
-      setPhotosSettled(true);
-      return;
-    }
 
     void Promise.all(photosToLoad.map((photo) => premisePhotoToFile(photo)))
       .then((files) => {
@@ -98,14 +99,14 @@ function WorkspaceForm({
       })
       .finally(() => {
         if (!cancelled) {
-          setPhotosSettled(true);
+          setPhotosLoading(false);
         }
       });
 
     return () => {
       cancelled = true;
     };
-    // Refetching the same workspace must not overwrite edits.
+    // Refetching the same workspace must not cancel the photo download.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialWorkspaceId]);
 
@@ -188,11 +189,7 @@ function WorkspaceForm({
     );
   };
 
-  if (
-    initialWorkspace &&
-    initialWorkspace.photos.length > 0 &&
-    !photosSettled
-  ) {
+  if (photosLoading) {
     return <PageLoader />;
   }
 

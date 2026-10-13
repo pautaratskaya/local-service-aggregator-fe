@@ -1,5 +1,6 @@
 import type { RoleApplicationStatus } from '../../types/user';
 import { API_BASE_URL } from '../config';
+import { checkSession } from '../session';
 
 export interface RequestMasterPayload {
   name: string;
@@ -44,6 +45,8 @@ export async function requestMaster({
       },
       body: JSON.stringify(payload),
     });
+
+    checkSession(response);
 
     if (!response.ok) {
       if (response.status === 401) {

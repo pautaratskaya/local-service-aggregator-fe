@@ -5,7 +5,7 @@ import styles from './HeaderMenu.module.scss';
 import { BurgerIcon, CrossIcon } from '../../../icons';
 import { useAuthStore } from '../../../stores/authStore';
 import { USER_ROLES, type User } from '../../../types/user';
-import { hasUnreadNotification } from '../../../pages/Profile/ProfileNotifications';
+import { hasUnreadNotification } from '../../../pages/Profile/unreadNotification';
 
 interface HeaderMenuProps {
   user: User;

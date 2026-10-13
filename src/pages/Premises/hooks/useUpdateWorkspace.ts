@@ -28,11 +28,21 @@ export function useUpdateWorkspace(workspaceId: number) {
         payload: workspace,
       });
 
-      await landlordService.replaceWorkspaceServices({
-        token,
-        workspaceId,
-        serviceItemIds: serviceItemIds ?? [],
-      });
+      try {
+        await landlordService.replaceWorkspaceServices({
+          token,
+          workspaceId,
+          serviceItemIds: serviceItemIds ?? [],
+        });
+      } catch {
+        // The workspace itself is already saved: show it in the list.
+        await queryClient.invalidateQueries({
+          queryKey: landlordPremisesQueryKey(userId),
+        });
+        throw new Error(
+          'Данные рабочего места сохранены, но услуги обновить не удалось. Попробуйте ещё раз',
+        );
+      }
 
       return updated;
     },

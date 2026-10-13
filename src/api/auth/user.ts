@@ -1,5 +1,6 @@
 import type { User } from '../../types/user';
 import { API_BASE_URL } from '../config';
+import { checkSession } from '../session';
 import { COMMON_ERROR_TYPES } from '../errors';
 import { AuthError } from './types';
 
@@ -50,6 +51,8 @@ export async function getUser(data: GetUserRequest): Promise<User> {
         Authorization: `Bearer ${data.token}`,
       },
     });
+
+    checkSession(response);
 
     if (!response.ok) {
       const { type, message } = getErrorInfo(response.status);

@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '../config';
+import { checkSession } from '../session';
 import {
   LANDLORD_ERROR_TYPES,
   LandlordError,
@@ -33,6 +34,8 @@ export async function landlordRequest(
         ...init?.headers,
       },
     });
+
+    checkSession(response);
 
     if (!response.ok) {
       throw await landlordErrorFromResponse(response, options);

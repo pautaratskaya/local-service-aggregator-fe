@@ -37,6 +37,9 @@ function FileInput({
       file,
       url: URL.createObjectURL(file),
     }));
+    // Object URLs are created and revoked in one effect: with useMemo,
+    // StrictMode's cleanup would revoke URLs that are still rendered.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPreviewItems(items);
 
     return () => {

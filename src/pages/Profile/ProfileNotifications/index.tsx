@@ -7,25 +7,8 @@ import {
 } from '../../../types/user';
 import { useMarkRoleNotificationRead } from '../hooks/useMarkRoleNotificationRead';
 import { getLandlordStatusText, getMasterStatusText } from '../statusText';
+import { isUnreadDecision } from '../unreadNotification';
 import styles from './ProfileNotifications.module.scss';
-
-export function hasUnreadNotification(user: User): boolean {
-  return (
-    isUnreadDecision(user.landlordApplication ?? null) ||
-    isUnreadDecision(user.masterApplication ?? null)
-  );
-}
-
-export function isUnreadDecision(application: RoleApplication | null): boolean {
-  if (!application || application.notificationRead) {
-    return false;
-  }
-
-  return (
-    application.status === ROLE_APPLICATION_STATUSES.APPROVED ||
-    application.status === ROLE_APPLICATION_STATUSES.REJECTED
-  );
-}
 
 function decisionMessage(
   application: RoleApplication,

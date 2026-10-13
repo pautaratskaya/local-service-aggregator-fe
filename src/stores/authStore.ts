@@ -2,24 +2,26 @@ import { useSyncExternalStore } from 'react';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { userDetailsQueryKey } from '../hooks/userDetailsQueryKey';
-import { queryClient } from '../providers/QueryProvider';
+import { queryClient } from '../providers/queryClient';
 import { USER_ROLES, type UserRole } from '../types/user';
 
 interface AuthState {
   selectedRole: UserRole | null;
   userId: number | null;
   token: string | null;
+  sessionExpired: boolean;
 
   setSelectedRole: (role: UserRole) => void;
   setAuth: (userId: number, token: string) => Promise<void>;
+  expireSession: () => void;
   logout: () => void;
-  reset: () => void;
 }
 
 const initialState = {
   selectedRole: null,
   userId: null,
   token: null,
+  sessionExpired: false,
 };
 
 export const useAuthStore = create<AuthState>()(
@@ -28,13 +30,28 @@ export const useAuthStore = create<AuthState>()(
       ...initialState,
       setSelectedRole: (role) => set({ selectedRole: role }),
       setAuth: async (userId, token) => {
-        set({ userId, token, selectedRole: USER_ROLES.CUSTOMER });
+        set({
+          userId,
+          token,
+          selectedRole: USER_ROLES.CUSTOMER,
+          sessionExpired: false,
+        });
         await queryClient.invalidateQueries({
           queryKey: userDetailsQueryKey(userId),
         });
       },
-      logout: () => set({ userId: null, token: null, selectedRole: null }),
-      reset: () => set(initialState),
+      // A 401 that arrives after logout must not show the expired screen.
+      expireSession: () =>
+        set((state) => (state.token ? { sessionExpired: true } : {})),
+      logout: () => {
+        set({
+          userId: null,
+          token: null,
+          selectedRole: null,
+          sessionExpired: false,
+        });
+        queryClient.clear();
+      },
     }),
     {
       name: 'auth-storage',

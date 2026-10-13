@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from 'react';
+import { useState } from 'react';
 import type { RequestMasterPayload } from '../../api/master/requestMaster';
 import Button from '../../components/Button';
 import Modal from '../../components/Modal';
@@ -19,27 +19,23 @@ function BecomeMaster() {
     user?.masterRoleStatus === ROLE_APPLICATION_STATUSES.REJECTED;
   const masterQuery = useMyMaster(isReapply);
   const master = masterQuery.data;
-  const masterId = master?.id;
   const [name, setName] = useState('');
   const [speciality, setSpeciality] = useState('');
   const [city, setCity] = useState('');
   const [description, setDescription] = useState('');
   const [errors, setErrors] = useState<Errors>({});
+  const [appliedMasterId, setAppliedMasterId] = useState<number>();
   const submitMutation = useRequestMaster();
   const showLoader = isReapply && !masterQuery.isError && masterQuery.isLoading;
 
-  useLayoutEffect(() => {
-    if (!master) {
-      return;
-    }
-
+  // Refetching the same profile must not overwrite edits.
+  if (master && master.id !== appliedMasterId) {
+    setAppliedMasterId(master.id);
     setName(master.name ?? '');
     setSpeciality(master.speciality ?? '');
     setCity(master.city ?? '');
     setDescription(master.bio ?? '');
-    // Refetching the same profile must not overwrite edits.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [masterId]);
+  }
 
   const validateForm = () => {
     const nextErrors: Errors = {};

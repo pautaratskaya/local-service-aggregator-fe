@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '../config';
+import { checkSession } from '../session';
 import type { RoleApplicationStatus } from '../../types/user';
 
 export interface MasterSummary {
@@ -39,6 +40,8 @@ export async function listMasters({
         },
       },
     );
+
+    checkSession(response);
 
     if (!response.ok) {
       throw new Error(`Ошибка сервера: ${response.status}`);

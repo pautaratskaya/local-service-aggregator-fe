@@ -50,18 +50,16 @@ function PremiseForm({
   const [descriptionText, setDescriptionText] = useState('');
   const [photos, setPhotos] = useState<File[]>([]);
   const [photosLoading, setPhotosLoading] = useState(false);
-  const [photosSettled, setPhotosSettled] = useState(false);
   const [companyName, setCompanyName] = useState('');
   const [registrationNumber, setRegistrationNumber] = useState('');
   const [bankDetails, setBankDetails] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
+  const [appliedPremiseId, setAppliedPremiseId] = useState<number>();
 
-  useLayoutEffect(() => {
-    if (!initialPremise) {
-      return;
-    }
-
+  // Refetching the same premise must not overwrite edits.
+  if (initialPremise && initialPremise.id !== appliedPremiseId) {
+    setAppliedPremiseId(initialPremise.id);
     applyRejectedPremise(initialPremise, {
       setPlaceName,
       setCity,
@@ -71,18 +69,19 @@ function PremiseForm({
       setRegistrationNumber,
       setBankDetails,
     });
+    setPhotosLoading(initialPremise.photos.length > 0);
+  }
+
+  useLayoutEffect(() => {
+    if (!initialPremise || initialPremise.photos.length === 0) {
+      return;
+    }
 
     let cancelled = false;
     const photosToLoad = [...initialPremise.photos].sort(
       (a, b) => a.order - b.order,
     );
 
-    if (photosToLoad.length === 0) {
-      setPhotosSettled(true);
-      return;
-    }
-
-    setPhotosLoading(true);
     void Promise.all(photosToLoad.map((photo) => premisePhotoToFile(photo)))
       .then((files) => {
         if (!cancelled) {
@@ -100,7 +99,6 @@ function PremiseForm({
       .finally(() => {
         if (!cancelled) {
           setPhotosLoading(false);
-          setPhotosSettled(true);
         }
       });
 
@@ -195,10 +193,7 @@ function PremiseForm({
     });
   };
 
-  const waitingForInitialPhotos =
-    (initialPremise?.photos.length ?? 0) > 0 && !photosSettled;
-
-  if (waitingForInitialPhotos) {
+  if (photosLoading) {
     return <PageLoader />;
   }
 

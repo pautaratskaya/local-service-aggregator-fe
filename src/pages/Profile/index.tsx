@@ -7,9 +7,10 @@ import {
   getUserRoleLabel,
   type UserRole,
 } from '../../types/user';
-import ProfileNotifications, { isUnreadDecision } from './ProfileNotifications';
+import ProfileNotifications from './ProfileNotifications';
 import styles from './Profile.module.scss';
 import { getLandlordStatusText, getMasterStatusText } from './statusText';
+import { isUnreadDecision } from './unreadNotification';
 
 function Profile() {
   const navigate = useNavigate();

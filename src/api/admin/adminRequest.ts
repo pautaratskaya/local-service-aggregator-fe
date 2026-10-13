@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '../config';
+import { checkSession } from '../session';
 import {
   CatalogItemInUseError,
   catalogItemInUseErrorFromResponse,
@@ -17,6 +18,8 @@ export async function adminRequest(
         ...init?.headers,
       },
     });
+
+    checkSession(response);
 
     if (!response.ok) {
       const inUseError = await catalogItemInUseErrorFromResponse(response);

@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '../config';
+import { checkSession } from '../session';
 
 export interface RejectMasterRequest {
   token: string;
@@ -23,6 +24,8 @@ export async function rejectMaster({
         ...(reason ? { reason } : {}),
       }),
     });
+
+    checkSession(response);
 
     if (!response.ok) {
       throw new Error(`Ошибка сервера: ${response.status}`);

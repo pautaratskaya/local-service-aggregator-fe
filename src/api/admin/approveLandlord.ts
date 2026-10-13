@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '../config';
+import { checkSession } from '../session';
 
 export interface ApproveLandlordRequest {
   token: string;
@@ -18,6 +19,8 @@ export async function approveLandlord({
       },
       body: JSON.stringify({ userId }),
     });
+
+    checkSession(response);
 
     if (!response.ok) {
       throw new Error(`Ошибка сервера: ${response.status}`);

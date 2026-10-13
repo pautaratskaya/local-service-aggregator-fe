@@ -1,5 +1,6 @@
 import type { User } from '../../types/user';
 import { API_BASE_URL } from '../config';
+import { checkSession } from '../session';
 import { AuthError } from './types';
 import { GET_USER_ERROR_TYPES } from './user';
 
@@ -61,6 +62,8 @@ export async function markRoleNotificationRead({
         },
       }
     );
+
+    checkSession(response);
 
     if (!response.ok) {
       const { type, message } = getErrorInfo(response.status);

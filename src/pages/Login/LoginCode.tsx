@@ -50,22 +50,6 @@ function LoginCode({ onNext, onBack, phone }: LoginCodeProps) {
     return () => clearInterval(timer);
   }, [timeLeft]);
 
-  // Automatically submit when code is complete
-  useEffect(() => {
-    if (canSubmitCode) {
-      handleSubmit();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code]);
-
-  // Clear error when user changes code
-  useEffect(() => {
-    if (error) {
-      setError(null);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code]);
-
   const handleResendCode = async () => {
     if (isResending) {
       return;
@@ -85,6 +69,15 @@ function LoginCode({ onNext, onBack, phone }: LoginCodeProps) {
       setIsResending(false);
     }
   };
+
+  // Clear error when user changes code
+  useEffect(() => {
+    if (error) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setError(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [code]);
 
   const handleLoginError = useCallback(
     (err: unknown) => {
@@ -125,6 +118,15 @@ function LoginCode({ onNext, onBack, phone }: LoginCodeProps) {
       setIsSubmitting(false);
     }
   }, [canSubmitCode, phone, code, setAuth, handleLoginError, onNext]);
+
+  // Automatically submit when code is complete
+  useEffect(() => {
+    if (canSubmitCode) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      handleSubmit();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [code]);
 
   useEnterSubmit(handleSubmit);
 
