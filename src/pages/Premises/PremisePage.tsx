@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { PREMISE_STATUSES } from '../../api/admin/listLandlords';
+import ActionsMenu from '../../components/ActionsMenu';
 import Button from '../../components/Button';
 import FetchErrorNotice from '../../components/FetchErrorNotice';
 import PageLoader from '../../components/PageLoader';
+import PhotoScroller from '../../components/PhotoScroller';
 import { formatDateTime } from '../../helpers';
 import { useLandlordPremises } from '../../hooks/useLandlordPremises';
 import DeleteDialog from './DeleteDialog';
@@ -72,56 +74,58 @@ function PremisePage() {
     Boolean(premise.legalDetails?.trim());
 
   return (
-    <div className={styles.premises}>
-      <div className={styles.premiseBody}>
-        <nav className={styles.breadcrumb}>
-          <Link to="/premises">Мои помещения</Link>
-        </nav>
-        <div className={styles.header}>
-          <h1>{premise.name}</h1>
-          <div className={styles.headerActions}>
-            <Button
-              type="button"
-              className={styles.addButton}
-              cta
-              onClick={() =>
-                navigate(`/edit-premise/${premise.id}`, {
-                  state: { background: location },
-                })
-              }
-            >
-              Изменить
-            </Button>
-            <Button
-              type="button"
-              className={styles.addButton}
-              cta
-              onClick={() => setDeleteOpen(true)}
-            >
-              Удалить
-            </Button>
-          </div>
-        </div>
-        {photos.length > 0 && (
-          <ul
-            className={`${styles.gallery} ${photos.length === 1 ? styles.solo : ''}`}
-          >
-            {photos.map((photo, index) => (
-              <li
-                key={photo.id}
-                className={index === 0 ? styles.hero : undefined}
-              >
-                <button
-                  type="button"
-                  aria-label={`Открыть фото ${index + 1}`}
-                  onClick={() => setPhotoIndex(index)}
-                >
-                  <img src={photo.url} alt="" />
-                </button>
-              </li>
-            ))}
-          </ul>
+    <div className={`${styles.premises} ${styles.premiseView}`}>
+      <nav className={styles.breadcrumb}>
+        <Link to="/premises">Мои помещения</Link>
+      </nav>
+      <PhotoScroller
+        photos={photos}
+        className={`${styles.stage} ${photos.length > 1 ? styles.swipeable : ''}`}
+        onActivate={(index) => {
+          if (photos.length > 0) {
+            setPhotoIndex(index);
+          }
+        }}
+      >
+        {({ index, scrollTo }) => (
+          <>
+            {photos.length > 1 && (
+              <span className={styles.dashes}>
+                {photos.map((photo, photoIndex) => (
+                  <button
+                    key={photo.id}
+                    type="button"
+                    className={photoIndex === index ? styles.active : undefined}
+                    aria-label={`Фото ${photoIndex + 1}`}
+                    aria-current={photoIndex === index ? 'true' : undefined}
+                    onClick={() => scrollTo(photoIndex)}
+                  />
+                ))}
+              </span>
+            )}
+            {photos.length > 0 && (
+              <span className={styles.photoCount}>{photos.length}</span>
+            )}
+            <ActionsMenu
+              items={[
+                {
+                  label: 'Изменить',
+                  onSelect: () =>
+                    navigate(`/edit-premise/${premise.id}`, {
+                      state: { background: location },
+                    }),
+                },
+                {
+                  label: 'Удалить',
+                  onSelect: () => setDeleteOpen(true),
+                },
+              ]}
+            />
+          </>
         )}
+      </PhotoScroller>
+      <section className={styles.sheet}>
+        <h1>{premise.name}</h1>
         <section className={styles.about}>
           <p className={styles.place}>
             {premise.city}, {premise.address}
@@ -187,7 +191,7 @@ function PremisePage() {
             <p className={styles.workspaceEmpty}>Рабочих мест пока нет</p>
           )}
         </div>
-      </div>
+      </section>
       {photoIndex != null && (
         <PhotoViewer
           photos={photos.map((photo) => ({ src: photo.url }))}

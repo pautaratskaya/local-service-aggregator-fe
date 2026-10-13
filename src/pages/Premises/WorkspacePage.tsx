@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import Button from '../../components/Button';
+import ActionsMenu from '../../components/ActionsMenu';
 import FetchErrorNotice from '../../components/FetchErrorNotice';
 import PageLoader from '../../components/PageLoader';
-import { formatOptional } from '../../helpers';
+import PhotoScroller from '../../components/PhotoScroller';
 import { useLandlordPremises } from '../../hooks/useLandlordPremises';
 import DeleteDialog from './DeleteDialog';
 import { findWorkspace } from './findPremise';
@@ -18,7 +18,7 @@ function WorkspacePage() {
   const premisesQuery = useLandlordPremises(true);
   const deleteWorkspace = useDeleteWorkspace();
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [photoIndex, setPhotoIndex] = useState<number | null>(null);
+  const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   const found = findWorkspace(premisesQuery.data, workspaceId);
 
   const closeDelete = () => {
@@ -64,81 +64,74 @@ function WorkspacePage() {
   const photos = [...workspace.photos].sort((a, b) => a.order - b.order);
 
   return (
-    <div className={styles.premises}>
+    <div className={`${styles.premises} ${styles.workspaceView}`}>
       <nav className={styles.breadcrumb}>
         <Link to="/premises">Мои помещения</Link>
         <span> / </span>
         <Link to={`/premises/${premise.id}`}>{premise.name}</Link>
       </nav>
-      <div className={styles.header}>
+      <PhotoScroller
+        photos={photos}
+        className={`${styles.stage} ${photos.length > 1 ? styles.swipeable : ''}`}
+        onActivate={(index) => {
+          if (photos.length > 0) {
+            setViewerIndex(index);
+          }
+        }}
+      >
+        {({ index, scrollTo }) => (
+          <>
+            {photos.length > 1 && (
+              <span className={styles.dashes}>
+                {photos.map((photo, photoIndex) => (
+                  <button
+                    key={photo.id}
+                    type="button"
+                    className={photoIndex === index ? styles.active : undefined}
+                    aria-label={`Фото ${photoIndex + 1}`}
+                    aria-current={photoIndex === index ? 'true' : undefined}
+                    onClick={() => scrollTo(photoIndex)}
+                  />
+                ))}
+              </span>
+            )}
+            {photos.length > 0 && (
+              <span className={styles.photoCount}>{photos.length}</span>
+            )}
+            <ActionsMenu
+              items={[
+                {
+                  label: 'Изменить',
+                  onSelect: () =>
+                    navigate(`/edit-workspace/${workspace.id}`, {
+                      state: { background: location },
+                    }),
+                },
+                {
+                  label: 'Удалить',
+                  onSelect: () => setDeleteOpen(true),
+                },
+              ]}
+            />
+          </>
+        )}
+      </PhotoScroller>
+      <section className={styles.sheet}>
         <h1>{workspace.kind}</h1>
-        <div className={styles.headerActions}>
-          <Button
-            type="button"
-            className={styles.addButton}
-            cta
-            onClick={() =>
-              navigate(`/edit-workspace/${workspace.id}`, {
-                state: { background: location },
-              })
-            }
-          >
-            Изменить
-          </Button>
-          <Button
-            type="button"
-            className={styles.addButton}
-            cta
-            onClick={() => setDeleteOpen(true)}
-          >
-            Удалить
-          </Button>
-        </div>
-      </div>
-      {photos.length > 0 && (
-        <ul
-          className={`${styles.gallery} ${photos.length === 1 ? styles.solo : ''}`}
-        >
-          {photos.map((photo, index) => (
-            <li
-              key={photo.id}
-              className={index === 0 ? styles.hero : undefined}
-            >
-              <button
-                type="button"
-                aria-label={`Открыть фото ${index + 1}`}
-                onClick={() => setPhotoIndex(index)}
-              >
-                <img src={photo.url} alt="" />
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-      <dl className={styles.details}>
-        <div>
-          <dt>Тип</dt>
-          <dd>{workspace.kind}</dd>
-        </div>
-        <div>
-          <dt>Описание</dt>
-          <dd>{formatOptional(workspace.description)}</dd>
-        </div>
-        <div>
-          <dt>Цена аренды за час</dt>
-          <dd>{workspace.pricePerHour}</dd>
-        </div>
-        <div>
-          <dt>Минимальное время аренды</dt>
-          <dd>{workspace.minRentMinutes} мин</dd>
-        </div>
-      </dl>
-      {photoIndex != null && (
+        {workspace.description?.trim() && (
+          <p className={styles.description}>{workspace.description}</p>
+        )}
+        <p className={styles.facts}>
+          <span>{workspace.pricePerHour} Br/час</span>
+          <span>от {workspace.minRentMinutes} мин</span>
+        </p>
+      </section>
+      {viewerIndex != null && (
         <PhotoViewer
           photos={photos.map((photo) => ({ src: photo.url }))}
-          index={photoIndex}
-          onClose={() => setPhotoIndex(null)}
-          onIndex={setPhotoIndex}
+          index={viewerIndex}
+          onClose={() => setViewerIndex(null)}
+          onIndex={setViewerIndex}
         />
       )}
       {deleteOpen && (

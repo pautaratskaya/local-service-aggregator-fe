@@ -1,0 +1,22 @@
+---
+description: Uniplace visual language for pages and components
+alwaysApply: true
+---
+
+# Uniplace visual language
+
+Figma file Uniplace is the client and master app, mobile only. Landlord screens follow the same language. Keep the web header and burger menu. Do not add a bottom tab bar.
+
+## Apply
+
+- White page, text `#171819`, secondary text `#74767b`, grouped surfaces `#f1f1f2`.
+- Page title: Montserrat 700, about 32px, tight line-height. Card title: 600, about 18px. Meta: 13px, secondary color.
+- Primary action: existing black pill `Button` with `cta`. Do not invent a second button style.
+- Place cards: one rounded photo (radius about 20px), then text on the page. Title on the left. Address on the next line with a pin, in secondary gray. A small pastel pill under that. No border, no shadow, no photo mosaic, no sheet over the photo. Several photos: the image swipes one frame at a time and snaps. White dots at the bottom-right match the current photo; the active dot is solid white. A tap on the photo still opens the page.
+- Status pill: approved light green, review light lilac, rejected light red. Do not add a star rating.
+- Premise and workspace screens for a landlord: one large rounded photo. Swipe snaps one frame. Short white dashes are centered on the photo. A count sits at the bottom-right. Edit and delete live in the 3-dot menu on the photo. A white sheet with the title overlaps the bottom of the photo. No booking button. The premise screen keeps its address, description, and workspace list under the title. Workspace cards in that list use the same place-card layout: one photo, title, price, and minimum time.
+- On web, lists of cards wrap in a grid. Do not force a single phone column.
+
+## Do not add
+
+Reviews, ratings, favorites, hearts, maps, and other blocks that are not in the product yet.

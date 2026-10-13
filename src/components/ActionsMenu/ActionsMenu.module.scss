@@ -1,0 +1,59 @@
+@use '../../variables.scss' as *;
+
+.menu {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+
+  .button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background-color: $background-color;
+    cursor: pointer;
+
+    span {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background-color: $text-color;
+    }
+  }
+
+  .list {
+    position: absolute;
+    top: 48px;
+    right: 0;
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    border-radius: 16px;
+    background-color: $background-color;
+    box-shadow: 0 8px 24px rgba($text-color, 0.12);
+
+    button {
+      display: block;
+      width: 100%;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 10px;
+      background-color: transparent;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      white-space: nowrap;
+      cursor: pointer;
+
+      &:hover {
+        background-color: $input-background-color;
+      }
+    }
+  }
+}
