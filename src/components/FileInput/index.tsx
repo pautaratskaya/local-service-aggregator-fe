@@ -1,10 +1,4 @@
-import {
-  type InputHTMLAttributes,
-  useEffect,
-  useId,
-  useMemo,
-  useState,
-} from 'react';
+import { type InputHTMLAttributes, useEffect, useId, useState } from 'react';
 import { CrossIcon } from '../../icons';
 import PhotoViewer from '../PhotoViewer';
 import styles from './FileInput.module.scss';
@@ -34,20 +28,21 @@ function FileInput({
   const titleText = error || label;
   const pickButtonText = files.length > 0 ? 'Добавить фото' : 'Выбрать фото';
 
-  const previewItems = useMemo(
-    () =>
-      files.map((file) => ({
-        file,
-        url: URL.createObjectURL(file),
-      })),
-    [files],
-  );
+  const [previewItems, setPreviewItems] = useState<
+    { file: File; url: string }[]
+  >([]);
 
   useEffect(() => {
+    const items = files.map((file) => ({
+      file,
+      url: URL.createObjectURL(file),
+    }));
+    setPreviewItems(items);
+
     return () => {
-      previewItems.forEach(({ url }) => URL.revokeObjectURL(url));
+      items.forEach(({ url }) => URL.revokeObjectURL(url));
     };
-  }, [previewItems]);
+  }, [files]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     onChange?.(event);

@@ -4,6 +4,7 @@ import styles from './Admin.module.scss';
 type CatalogRowProps = {
   name: string;
   description?: string | null;
+  specialistName?: string;
   open?: boolean;
   onOpen?: () => void;
   onEdit: () => void;
@@ -15,6 +16,7 @@ type CatalogRowProps = {
 function CatalogRow({
   name,
   description,
+  specialistName,
   open = false,
   onOpen,
   onEdit,
@@ -25,6 +27,11 @@ function CatalogRow({
   const title = (
     <>
       <span className={styles.catalogName}>{name}</span>
+      {specialistName ? (
+        <span className={styles.catalogDescription}>
+          Специалист: {specialistName}
+        </span>
+      ) : null}
       {description ? (
         <span className={styles.catalogDescription}>{description}</span>
       ) : null}

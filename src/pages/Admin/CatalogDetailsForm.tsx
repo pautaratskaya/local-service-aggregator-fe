@@ -5,45 +5,86 @@ import TextareaInput from '../../components/TextareaInput';
 import TextInput from '../../components/TextInput';
 import styles from './Admin.module.scss';
 
-type CatalogDetailsFormProps = {
+type CatalogDetails = {
+  name: string;
+  description: string;
+};
+
+type WorkspaceTypeDetails = CatalogDetails & {
+  specialistName: string;
+};
+
+type CatalogDetailsFormBase = {
   name?: string | null;
   description?: string | null;
   isLoading?: boolean;
   loadingMessage?: string;
   loadError?: string;
   onCancel: () => void;
-  onSubmit?: (payload: { name: string; description: string }) => void;
   isPending?: boolean;
   canSubmit?: boolean;
 };
 
+type CatalogDetailsFormProps = CatalogDetailsFormBase &
+  (
+    | {
+        withSpecialist?: false;
+        specialistName?: never;
+        onSubmit?: (payload: CatalogDetails) => void;
+      }
+    | {
+        withSpecialist: true;
+        specialistName?: string;
+        onSubmit?: (payload: WorkspaceTypeDetails) => void;
+      }
+  );
+
 function CatalogDetailsForm({
   name: sourceName,
   description: sourceDescription,
+  specialistName: sourceSpecialist,
   isLoading = false,
   loadingMessage = 'Загружаем...',
   loadError,
   onCancel,
-  onSubmit,
   isPending = false,
   canSubmit = true,
+  ...props
 }: CatalogDetailsFormProps) {
   const [name, setName] = useState<string | null>(null);
   const [description, setDescription] = useState<string | null>(null);
+  const [specialistName, setSpecialistName] = useState<string | null>(null);
   const [showErrors, setShowErrors] = useState(false);
   const nameValue = name ?? sourceName ?? '';
   const descriptionValue = description ?? sourceDescription ?? '';
-  const canSave = canSubmit && !!nameValue.trim() && !isPending && !isLoading && !loadError;
+  const specialistValue = specialistName ?? sourceSpecialist ?? '';
+  const canSave =
+    canSubmit &&
+    !!nameValue.trim() &&
+    (!props.withSpecialist || !!specialistValue.trim()) &&
+    !isPending &&
+    !isLoading &&
+    !loadError;
 
   const save = () => {
-    if (!canSave || !onSubmit) {
+    if (!canSave || !props.onSubmit) {
       return;
     }
 
-    onSubmit({
+    const details = {
       name: nameValue.trim(),
       description: descriptionValue.trim(),
-    });
+    };
+
+    if (props.withSpecialist) {
+      props.onSubmit({
+        ...details,
+        specialistName: specialistValue.trim(),
+      });
+      return;
+    }
+
+    props.onSubmit(details);
   };
 
   useCatalogFormKeys({
@@ -75,6 +116,19 @@ function CatalogDetailsForm({
         value={descriptionValue}
         onChange={(event) => setDescription(event.target.value)}
       />
+      {props.withSpecialist && (
+        <TextInput
+          label="Специалист"
+          required
+          value={specialistValue}
+          onChange={(event) => setSpecialistName(event.target.value)}
+          error={
+            showErrors && !specialistValue.trim()
+              ? 'Введите название специалиста'
+              : undefined
+          }
+        />
+      )}
       <div className={styles.catalogFormActions}>
         <Button type="button" onClick={onCancel}>
           Отмена

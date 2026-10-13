@@ -5,13 +5,11 @@ export interface AdminServiceItem {
   workspaceTypeId: number;
   name: string;
   description: string | null;
-  durationMinutes: number;
 }
 
 export interface AdminServiceItemPayload {
   name: string;
   description: string;
-  durationMinutes: number;
 }
 
 export async function getServiceItem(

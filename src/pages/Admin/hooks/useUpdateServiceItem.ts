@@ -38,7 +38,6 @@ export function useUpdateServiceItem() {
                     ...service,
                     name: updated.name,
                     description: updated.description ?? '',
-                    durationMinutes: updated.durationMinutes,
                   }
                 : service,
             ),

@@ -4,13 +4,13 @@ export interface CatalogService {
   id: number;
   name: string;
   description: string;
-  durationMinutes: number;
 }
 
 export interface CatalogWorkspaceType {
   id: number;
   name: string;
   description: string;
+  specialistName: string;
   services: CatalogService[];
 }
 

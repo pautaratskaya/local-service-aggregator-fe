@@ -18,20 +18,14 @@ function ServiceItemForm({ id, onClose }: ServiceItemFormProps) {
   const updateServiceItem = useUpdateServiceItem();
   const [name, setName] = useState<string | null>(null);
   const [description, setDescription] = useState<string | null>(null);
-  const [durationMinutes, setDurationMinutes] = useState<string | null>(null);
   const [showErrors, setShowErrors] = useState(false);
   const nameValue = name ?? data?.name ?? '';
   const descriptionValue = description ?? data?.description ?? '';
-  const durationValue =
-    durationMinutes ?? (data ? String(data.durationMinutes) : '');
-  const durationNumber = Number(durationValue);
   const canSave =
     !!data &&
     !isLoading &&
     !isError &&
     !!nameValue.trim() &&
-    Number.isInteger(durationNumber) &&
-    durationNumber > 0 &&
     !updateServiceItem.isPending;
 
   const save = () => {
@@ -45,7 +39,6 @@ function ServiceItemForm({ id, onClose }: ServiceItemFormProps) {
         payload: {
           name: nameValue.trim(),
           description: descriptionValue.trim(),
-          durationMinutes: durationNumber,
         },
       },
       { onSuccess: onClose },
@@ -87,21 +80,6 @@ function ServiceItemForm({ id, onClose }: ServiceItemFormProps) {
         value={descriptionValue}
         onChange={(event) => setDescription(event.target.value)}
       />
-      <TextInput
-        label="Длительность, мин"
-        required
-        type="number"
-        min={1}
-        step={1}
-        value={durationValue}
-        onChange={(event) => setDurationMinutes(event.target.value)}
-        error={
-          showErrors &&
-          (!Number.isInteger(durationNumber) || durationNumber <= 0)
-            ? 'Введите длительность в минутах'
-            : undefined
-        }
-      />
       <div className={styles.catalogFormActions}>
         <Button type="button" onClick={onClose}>
           Отмена
@@ -136,14 +114,8 @@ export function CreateServiceItemForm({
   const createServiceItem = useCreateServiceItem();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [durationMinutes, setDurationMinutes] = useState('');
   const [showErrors, setShowErrors] = useState(false);
-  const durationNumber = Number(durationMinutes);
-  const canSave =
-    !!name.trim() &&
-    Number.isInteger(durationNumber) &&
-    durationNumber > 0 &&
-    !createServiceItem.isPending;
+  const canSave = !!name.trim() && !createServiceItem.isPending;
 
   const save = () => {
     if (!canSave) {
@@ -156,7 +128,6 @@ export function CreateServiceItemForm({
         payload: {
           name: name.trim(),
           description: description.trim(),
-          durationMinutes: durationNumber,
         },
       },
       { onSuccess: onClose },
@@ -183,21 +154,6 @@ export function CreateServiceItemForm({
         label="Описание"
         value={description}
         onChange={(event) => setDescription(event.target.value)}
-      />
-      <TextInput
-        label="Длительность, мин"
-        required
-        type="number"
-        min={1}
-        step={1}
-        value={durationMinutes}
-        onChange={(event) => setDurationMinutes(event.target.value)}
-        error={
-          showErrors &&
-          (!Number.isInteger(durationNumber) || durationNumber <= 0)
-            ? 'Введите длительность в минутах'
-            : undefined
-        }
       />
       <div className={styles.catalogFormActions}>
         <Button type="button" onClick={onClose}>

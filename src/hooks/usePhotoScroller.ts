@@ -1,4 +1,4 @@
-import { useRef, useState, type MouseEvent, type PointerEvent } from 'react';
+import { useCallback, useRef, useState, type MouseEvent, type PointerEvent } from 'react';
 
 type Drag = {
   pointerId: number;
@@ -6,13 +6,13 @@ type Drag = {
   left: number;
 };
 
-export function usePhotoScroller(count: number) {
-  const [index, setIndex] = useState(0);
+export function usePhotoScroller(count: number, startIndex = 0) {
+  const [index, setIndex] = useState(startIndex);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<Drag | null>(null);
   const suppressClickRef = useRef(false);
 
-  function scrollTo(next: number) {
+  const scrollTo = useCallback((next: number) => {
     const scroller = scrollerRef.current;
     if (!scroller) {
       return;
@@ -22,7 +22,7 @@ export function usePhotoScroller(count: number) {
       left: next * scroller.clientWidth,
       behavior: 'smooth',
     });
-  }
+  }, []);
 
   function onScroll() {
     const scroller = scrollerRef.current;

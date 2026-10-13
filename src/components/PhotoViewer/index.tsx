@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useDialogLock } from '../../hooks/useDialogLock';
+import { usePhotoScroller } from '../../hooks/usePhotoScroller';
 import { CrossIcon } from '../../icons';
 import styles from './PhotoViewer.module.scss';
 
@@ -37,8 +38,17 @@ type PhotoViewerProps = {
 
 function PhotoViewer({ photos, index, onClose, onIndex }: PhotoViewerProps) {
   const activeThumbRef = useRef<HTMLButtonElement>(null);
+  const placedRef = useRef(false);
   const photo = photos[index];
   const hasMany = photos.length > 1;
+  const {
+    scrollerRef,
+    scrollTo,
+    onScroll,
+    onPointerDown,
+    onPointerMove,
+    onPointerUp,
+  } = usePhotoScroller(photos.length, index);
 
   useDialogLock();
 
@@ -48,6 +58,39 @@ function PhotoViewer({ photos, index, onClose, onIndex }: PhotoViewerProps) {
 
   const showPrev = () => {
     onIndex(index === 0 ? photos.length - 1 : index - 1);
+  };
+
+  useLayoutEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller || scroller.clientWidth === 0) {
+      return;
+    }
+
+    const left = index * scroller.clientWidth;
+    if (Math.abs(scroller.scrollLeft - left) < 1) {
+      placedRef.current = true;
+      return;
+    }
+
+    if (!placedRef.current) {
+      scroller.scrollLeft = left;
+      placedRef.current = true;
+      return;
+    }
+
+    scrollTo(index);
+  }, [index, scrollTo, scrollerRef]);
+
+  const onTrackScrollEnd = () => {
+    const scroller = scrollerRef.current;
+    if (!scroller || scroller.clientWidth === 0) {
+      return;
+    }
+
+    const next = Math.round(scroller.scrollLeft / scroller.clientWidth);
+    if (next !== index) {
+      onIndex(next);
+    }
   };
 
   useEffect(() => {
@@ -91,19 +134,11 @@ function PhotoViewer({ photos, index, onClose, onIndex }: PhotoViewerProps) {
 
   return createPortal(
     <div className={styles.viewer} onClick={onClose}>
-      <form
-        className={styles.viewerForm}
+      <div
+        className={styles.viewerBody}
         role="dialog"
         aria-modal="true"
         aria-label="Просмотр фотографий"
-        onSubmit={(event) => {
-          event.preventDefault();
-          if (hasMany) {
-            showNext();
-          } else {
-            onClose();
-          }
-        }}
       >
         <div
           className={styles.viewerBar}
@@ -113,7 +148,7 @@ function PhotoViewer({ photos, index, onClose, onIndex }: PhotoViewerProps) {
             {index + 1} / {photos.length}
           </span>
           <button
-            type={hasMany ? 'button' : 'submit'}
+            type="button"
             className={styles.viewerClose}
             aria-label="Закрыть"
             onClick={onClose}
@@ -121,7 +156,26 @@ function PhotoViewer({ photos, index, onClose, onIndex }: PhotoViewerProps) {
             <CrossIcon />
           </button>
         </div>
-        <div className={styles.viewerStage}>
+        <div
+          className={styles.viewerStage}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerUp}
+          onClick={(event) => event.stopPropagation()}
+        >
+          <div
+            ref={scrollerRef}
+            className={styles.viewerTrack}
+            onScroll={onScroll}
+            onScrollEnd={onTrackScrollEnd}
+          >
+            {photos.map((item, itemIndex) => (
+              <div key={`${item.src}-${itemIndex}`} className={styles.slide}>
+                <img src={item.src} alt="" />
+              </div>
+            ))}
+          </div>
           {hasMany && (
             <button
               type="button"
@@ -135,17 +189,15 @@ function PhotoViewer({ photos, index, onClose, onIndex }: PhotoViewerProps) {
               <NavChevron direction="left" />
             </button>
           )}
-          <img
-            src={photo.src}
-            alt=""
-            onClick={(event) => event.stopPropagation()}
-          />
           {hasMany && (
             <button
-              type="submit"
+              type="button"
               className={`${styles.viewerNav} ${styles.next}`}
               aria-label="Следующее фото"
-              onClick={(event) => event.stopPropagation()}
+              onClick={(event) => {
+                event.stopPropagation();
+                showNext();
+              }}
             >
               <NavChevron direction="right" />
             </button>
@@ -171,7 +223,7 @@ function PhotoViewer({ photos, index, onClose, onIndex }: PhotoViewerProps) {
             ))}
           </div>
         )}
-      </form>
+      </div>
     </div>,
     document.body,
   );

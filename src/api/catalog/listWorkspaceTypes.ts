@@ -3,6 +3,7 @@ import { API_BASE_URL } from '../config';
 export interface WorkspaceType {
   id: number;
   workspaceName: string;
+  specialistName: string;
 }
 
 export async function listWorkspaceTypes(): Promise<WorkspaceType[]> {

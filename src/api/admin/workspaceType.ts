@@ -5,11 +5,13 @@ export interface AdminWorkspaceType {
   groupId: number;
   name: string;
   description: string;
+  specialistName: string;
 }
 
 export interface AdminWorkspaceTypePayload {
   name: string;
   description: string;
+  specialistName: string;
 }
 
 export async function getWorkspaceType(

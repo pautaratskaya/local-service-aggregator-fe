@@ -15,6 +15,8 @@ function WorkspaceTypeForm({ id, onClose }: WorkspaceTypeFormProps) {
     <CatalogDetailsForm
       name={data?.name}
       description={data?.description}
+      withSpecialist
+      specialistName={data?.specialistName}
       isLoading={isLoading}
       loadingMessage="Загружаем тип помещения..."
       loadError={

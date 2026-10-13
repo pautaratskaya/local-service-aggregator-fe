@@ -39,6 +39,7 @@ export function useCreateWorkspaceType() {
                     id: created.id,
                     name: created.name,
                     description: created.description,
+                    specialistName: created.specialistName,
                     services: [],
                   },
                 ],

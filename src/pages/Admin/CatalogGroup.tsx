@@ -94,6 +94,7 @@ function AdminCatalogGroup() {
         form={(onClose) => (
           <CatalogDetailsForm
             onCancel={onClose}
+            withSpecialist
             isPending={createWorkspaceType.isPending}
             onSubmit={(payload) => {
               createWorkspaceType.mutate(
@@ -125,6 +126,7 @@ function AdminCatalogGroup() {
                       key={workspaceType.id}
                       name={workspaceType.name}
                       description={workspaceType.description}
+                      specialistName={workspaceType.specialistName}
                       open={isOpen}
                       onOpen={() => {
                         setEditingTypeId(null);

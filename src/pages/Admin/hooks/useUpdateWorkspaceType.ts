@@ -36,6 +36,7 @@ export function useUpdateWorkspaceType() {
                   ...workspaceType,
                   name: updated.name,
                   description: updated.description,
+                  specialistName: updated.specialistName,
                 }
               : workspaceType,
           ),
