@@ -7,9 +7,16 @@ import { useEffect } from 'react';
 function useEnterSubmit(callback: () => void) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Enter') {
-        callback();
+      if (e.key !== 'Enter' || e.repeat || e.isComposing) {
+        return;
       }
+
+      // A focused button or link already runs its own click on Enter.
+      if (e.target instanceof Element && e.target.closest('button, a')) {
+        return;
+      }
+
+      callback();
     };
 
     window.addEventListener('keydown', handleKeyDown);

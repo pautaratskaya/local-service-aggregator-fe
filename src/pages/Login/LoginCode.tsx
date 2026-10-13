@@ -29,6 +29,7 @@ function LoginCode({ onNext, onBack, phone }: LoginCodeProps) {
   const [code, setCode] = useState('');
   const [timeLeft, setTimeLeft] = useState(RESEND_CODE_TIMER);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResending, setIsResending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const setAuth = useAuthStore((state) => state.setAuth);
@@ -65,9 +66,24 @@ function LoginCode({ onNext, onBack, phone }: LoginCodeProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [code]);
 
-  const handleResendCode = () => {
-    // TODO: Implement code resend
-    setTimeLeft(RESEND_CODE_TIMER);
+  const handleResendCode = async () => {
+    if (isResending) {
+      return;
+    }
+
+    setIsResending(true);
+    setError(null);
+
+    try {
+      await authService.requestCode({ phone });
+      setTimeLeft(RESEND_CODE_TIMER);
+    } catch (err) {
+      setError(
+        err instanceof AuthError ? err.message : 'Произошла неизвестная ошибка'
+      );
+    } finally {
+      setIsResending(false);
+    }
   };
 
   const handleLoginError = useCallback(
@@ -133,8 +149,12 @@ function LoginCode({ onNext, onBack, phone }: LoginCodeProps) {
           </p>
         ) : (
           <p className={styles.info}>
-            <button onClick={handleResendCode} className={styles.resendButton}>
-              Отправить код ещё раз
+            <button
+              onClick={handleResendCode}
+              className={styles.resendButton}
+              disabled={isResending}
+            >
+              {isResending ? 'Отправка...' : 'Отправить код ещё раз'}
             </button>
           </p>
         )}

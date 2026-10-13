@@ -95,30 +95,34 @@ function PhotoViewer({ photos, index, onClose, onIndex }: PhotoViewerProps) {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
+      if (!['Escape', 'Enter', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+        return;
+      }
+
+      // The viewer can open inside a modal: keep its keys from reaching the modal's handlers.
+      event.preventDefault();
+      event.stopPropagation();
+
       if (event.key === 'Escape') {
-        event.preventDefault();
         onClose();
       }
 
       if (event.key === 'ArrowLeft' && hasMany) {
-        event.preventDefault();
         onIndex(index === 0 ? photos.length - 1 : index - 1);
       }
 
       if ((event.key === 'ArrowRight' || event.key === 'Enter') && hasMany) {
-        event.preventDefault();
         onIndex(index === photos.length - 1 ? 0 : index + 1);
       }
 
       if (event.key === 'Enter' && !hasMany) {
-        event.preventDefault();
         onClose();
       }
     };
 
-    document.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keydown', onKeyDown, true);
 
-    return () => document.removeEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown, true);
   }, [hasMany, index, onClose, onIndex, photos.length]);
 
   useEffect(() => {
